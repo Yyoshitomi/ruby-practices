@@ -64,10 +64,10 @@ print "   " * first_wday
 (1..last_date).each do |date|
   # (1..last_date)から順番に取り出した値(date)を右詰で出力していく
   if date == td.day
-    CE.fg(:cyan)
+    CE.fg(:black).bg(:white)
     print tdd.to_s.rjust(2) + " "
   else
-    CE.fg(:white)
+    CE.fg(:white).bg(:black)
     print date.to_s.rjust(2) + " "
   end
 
