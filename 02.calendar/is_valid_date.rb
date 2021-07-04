@@ -5,7 +5,7 @@ def isValid_year(year, mon)
   n_year = year.to_i
   str_year = year.to_s
   
-  if (str_year =~ /^[0-9]+$/) && (9999 >= n_year) && (n_year >= 1)
+  if (9999 >= n_year) && (n_year >= 1)
     isValid_mon(n_year, mon)
   elsif
     print "cal: year `#{str_year}' not in range 1..9999\n"
