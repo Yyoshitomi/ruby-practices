@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require 'optparse'
-require 'date'
 
 require_relative './set_date'
 require_relative './is_valid_date'
