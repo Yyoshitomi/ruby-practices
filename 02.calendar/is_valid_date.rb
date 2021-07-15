@@ -1,7 +1,7 @@
 # 指定された値を検証する
 # 年は1-9999、かつ月は1-12の範囲内の整数であるかどうかを検証
 # 文字列や少数など整数でなさそうな場合などはメッセージを表示する
-def isValid_year(year, mon)
+def is_valid_year(year, mon)
   n_year = year.to_i
   str_year = year.to_s
   
@@ -12,7 +12,7 @@ def isValid_year(year, mon)
   end
 end
 
-def isValid_mon(year, mon)
+def is_valid_mon(year, mon)
   n_mon = mon.to_i
   str_mon = mon.to_s
 
