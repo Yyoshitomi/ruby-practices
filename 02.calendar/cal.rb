@@ -23,14 +23,14 @@ set_td_date
 
 if @opt_year
   is_valid_year @opt_year
-else @opt_year == nil
-  @opt_year = @tdy
+else
+  @input_year = @tdy
 end
 
 if @opt_mon
   is_valid_mon @opt_mon
-else @opt_mon == nil
-  @opt_mon = @tdm
+else
+  @input_mon = @tdm
 end
 
-set_calendar(@opt_year, @opt_mon)
+is_valid_calendar(@input_year, @input_mon)

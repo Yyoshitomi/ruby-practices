@@ -5,20 +5,30 @@ def is_valid_year(year)
   n_year = year.to_i
   str_year = year.to_s
   
-  if (9999 >= n_year) && (n_year >= 1)
-    @opt_year = n_year
-  else
-    print "cal: year `#{str_year}' not in range 1..9999\n"
-  end
+  @input_year = if (9999 >= n_year) && (n_year >= 1)
+                  n_year
+                else
+                  "cal: year `#{str_year}' not in range 1..9999"
+                end
 end
 
 def is_valid_mon(mon)
   n_mon = mon.to_i
   str_mon = mon.to_s
 
-  if (str_mon =~ /^[0-9]+$/) && (12 >= n_mon) && (n_mon >= 1)
-    @opt_mon = n_mon
+  @input_mon = if (str_mon =~ /^[0-9]+$/) && (12 >= n_mon) && (n_mon >= 1)
+                 n_mon
+               else
+                 "cal: #{str_mon} is neither a month number (1..12) nor a name"
+               end
+end
+
+def is_valid_calendar(year, mon)
+  if year.to_i == 0
+    puts year
+  elsif mon.to_i == 0
+    puts mon
   else
-    print "cal: #{str_mon} is neither a month number (1..12) nor a name\n"
+    set_calendar(year, mon)
   end
 end
