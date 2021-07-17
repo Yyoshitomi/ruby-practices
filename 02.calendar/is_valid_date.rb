@@ -24,10 +24,14 @@ def is_valid_mon(mon)
 end
 
 def is_valid_calendar(year, mon)
-  if year.to_i == 0
-    puts year
-  elsif mon.to_i == 0
-    puts mon
+  if (year.to_i == 0) | (mon.to_i == 0)
+    ary = [year, mon]
+    for i in ary
+      if i.to_i == 0
+        puts i
+        break
+      end
+    end
   else
     set_calendar(year, mon)
   end
