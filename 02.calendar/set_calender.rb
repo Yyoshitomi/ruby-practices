@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'color_echo'
-require_relative './set_date'
+require_relative 'set_date'
 
 def set_calendar(year, mon)
   set_td_date

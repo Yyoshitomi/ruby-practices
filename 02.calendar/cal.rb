@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 require 'optparse'
 
-require_relative './set_date'
-require_relative './is_valid_date'
-require_relative './set_calender'
+require_relative 'set_date'
+require_relative 'is_valid_date'
+require_relative 'set_calender'
 
 # オプション定義
 # オプションの引数を渡されたら、その値をto_iで数字にする
@@ -21,16 +21,16 @@ end
 # 今日の日付を呼んでおく
 set_td_date
 
-if @opt_year == nil && @opt_mon == nil
-  # 指定なしの場合は今日の日付
-  set_calendar(@tdy, @tdm)
-elsif @opt_year && @opt_mon
-  # 年月の指定ありの場合は一旦整数かどうか検証
-  isValid_year(@opt_year, @opt_mon)
-elsif @opt_year
-   # 年のみ指定ありの場合も一旦整数かどうか検証
-  isValid_year(@opt_year, @tdm)
-else
-   # 月のみ指定ありの場合も一旦整数かどうか検証
-  isValid_mon(@tdy, @opt_mon)
+if @opt_year
+  is_valid_year @opt_year
+else @opt_year == nil
+  @opt_year = @tdy
 end
+
+if @opt_mon
+  is_valid_mon @opt_mon
+else @opt_mon == nil
+  @opt_mon = @tdm
+end
+
+set_calendar(@opt_year, @opt_mon)
