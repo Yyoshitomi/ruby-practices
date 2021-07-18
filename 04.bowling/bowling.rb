@@ -22,7 +22,7 @@ frames.each_with_index do |frame, s|
   next_frame = frames[s + 1]
 
   def bonus_count(point)
-    point += 10
+    point + 10
   end
 
   if frame[0] == 10 # strike
