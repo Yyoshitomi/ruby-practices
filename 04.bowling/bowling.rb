@@ -27,7 +27,7 @@ frames.each_with_index do |frame, s|
 
   if frame[0] == 10 # strike
     point += bonus_count(next_frame.sum)
-    point += frames[s + 2][0] if (next_frame[0] == 10)
+    point += frames[s + 2][0] if next_frame[0] == 10
   elsif frame.sum == 10 # spare
     point += bonus_count(next_frame[0])
   else
