@@ -64,7 +64,7 @@ build-iPhoneSimulator/
 # macOS.gitignore ****************************
 
 # General
-# .DS_Store
+.DS_Store
 .AppleDouble
 .LSOverride
 
