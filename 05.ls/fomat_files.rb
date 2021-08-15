@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require_relative 'file'
 require_relative 'file_info'
 
-def multi_dir(path, i)
-  print "\n" if i >= 1
+def multi_dir(path, num)
+  print "\n" if num >= 1
   puts "#{path}:"
 end
 
 def open_files(path)
-  Dir::entries(path)
+  Dir.entries(path)
 end
 
 def exists_opt_long?(files, opts)
@@ -21,7 +23,7 @@ def exists_opt_long?(files, opts)
 end
 
 def sorted_files(files, opts)
-  files = open_files(files) if files.class == String
+  files = open_files(files) if files.instance_of?(String)
   # ファイルを並べ替え
   files.sort!
 
@@ -29,11 +31,11 @@ def sorted_files(files, opts)
   sorted_files = if opts[:a]
                    files
                  else
-                   files.reject { |file| file.start_with?(".") unless file.include?('/') }
+                   files.reject { |file| file.start_with?('.') unless file.include?('/') }
                  end
 
   # オプションrの場合はファイルの順序をひっくり返す
-  sorted_files = sorted_files.reverse! if opts[:r]
+  sorted_files.reverse! if opts[:r]
 
   sorted_files
 end

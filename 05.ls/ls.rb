@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
+# frozen_string_literal: true
+
 require 'optparse'
 require 'etc'
-require_relative "fomat_files"
+require_relative 'fomat_files'
 
 # オプション
 option = {}
@@ -21,7 +23,7 @@ if ARGV == []
 else
   directories = []
   files = []
-  
+
   ARGV.map do |arg|
     if FileTest.directory?(arg)
       directories << arg
@@ -32,12 +34,12 @@ else
     end
   end
 
-  exists_opt_long?(files, option) if (files != [])
+  exists_opt_long?(files, option) if files != []
 
   if directories != []
     directories.sort.each_with_index do |dir, i|
-      print "\n" if (files != [])
-      
+      print "\n" if files != []
+
       multi_dir(dir, i) if (i >= 1) || (files != [])
       exists_opt_long?(dir, option)
     end

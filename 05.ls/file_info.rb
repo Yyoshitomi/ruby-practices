@@ -1,13 +1,15 @@
-require "date"
-require_relative "fomat_files"
+# frozen_string_literal: true
+
+require 'date'
+require_relative 'fomat_files'
 
 class FileInfo
   def output(path, opts)
     sorted_files = sorted_files(path, opts)
-    path = nil if path.class == Array
+    path = nil if path.instance_of?(Array)
     paths = sorted_files.map { |file| File.expand_path(file, path) }
-    
-    output_total_blocks(paths) if path.class == String
+
+    output_total_blocks(paths) if path.instance_of?(String)
 
     finfo_ary(paths)
     finfo_len
@@ -15,10 +17,10 @@ class FileInfo
       file_info(file)
 
       print "#{@type}#{@mode}"
-      print "#{fomat_finfo_int(@nlink[i], @nlink_len)} "
-      print "#{fomat_finfo_string(@uid[i], @uid_len)}　"
-      print "#{fomat_finfo_string(@gid[i], @gid_len)}　"
-      print "#{fomat_finfo_int(@size[i], @size_len)} "
+      print "#{@nlink[i].rjust(@nlink_len, ' ')} "
+      print "#{@uid[i].ljust(@uid_len, ' ')}　"
+      print "#{@gid[i].ljust(@gid_len, ' ')}　"
+      print "#{@size[i].rjust(@size_len, ' ')} "
       print "#{@time} "
       print "#{sorted_files[i]}\n"
     end
@@ -27,14 +29,11 @@ class FileInfo
   private
 
   def fstat(file)
-    # ファイルタイプのよってlstatかstatでファイル情報を取得する
-    if (File.ftype(file) == "link")
-      stat = File.lstat(file)
-    else
-      stat = File.stat(file)
-    end
+    # ファイルタイプによってlstatかstatでファイル情報を取得する
+    File.ftype(file) == 'link' ? File.lstat(file) : File.stat(file)
   end
 
+  # -lの総合ブロック数
   def output_total_blocks(paths)
     blocks = 0
     paths.each { |file| blocks += fstat(file).blocks }
@@ -44,32 +43,32 @@ class FileInfo
   # ファイルタイプ
   def str_type(file)
     type = File.ftype(file)
-    type_char = type == "file" ? "-" : type[0]
+
+    type == 'file' ? '-' : type[0]
   end
 
-  def to_str_role(mode, n)
-    
+  # ファイル権限
+  def str_role(num)
+    {
+      '0' => '---',
+      '1' => '--x',
+      '2' => '-w-',
+      '3' => '-wx',
+      '4' => 'r--',
+      '5' => 'r-x',
+      '6' => 'rw-',
+      '7' => 'rwx'
+    }[num]
   end
 
-  def str_role(i)
-    role = {
-      "0" => "---",
-      "1" => "--x",
-      "2" => "-w-",
-      "3" => "-wx",
-      "4" => "r--",
-      "5" => "r-x",
-      "6" => "rw-",
-      "7" => "rwx"
-    }[i]
-  end
-
+  # sticky bitありの場合
   def sticky_bit(role)
-    role[2] = role[2] == "x" ? "t" : "T"
+    role[2] = role[2] == 'x' ? 't' : 'T'
   end
 
-  def set_id(role)
-    role[2] = role[2] == "x" ? "s" : "S"
+  # SUID,SGIDありの場合
+  def sid(role)
+    role[2] = role[2] == 'x' ? 's' : 'S'
   end
 
   # ファイルの権限を検証
@@ -81,44 +80,35 @@ class FileInfo
     other = str_role(mode[3])
 
     case mode[0]
-    when "1"
+    when '1'
       other = sticky_bit(othr)
-    when "2"
-      user = set_id(user)
-    when "4"
-      group = set_id(group)
+    when '2'
+      user = sid(user)
+    when '4'
+      group = sid(group)
     end
 
     role = user + group + other
-    
-    fomat_finfo_string(role, 11)
+    role.ljust(11, ' ')
   end
 
+  # 作成時間
   def ftime(time)
     # 6ヶ月以内のファイル/ディレクトリは月日時分
     # 6ヶ月以上前のファイル/ディレクトリは月日年
-    mon = fomat_finfo_int(time.strftime("%-m"), 2)
+    mon = time.strftime('%-m').ljust(2, ' ')
 
-    date = ((Date.today - time.to_date).abs > 181) ? "#{mon} %e  %Y" : "#{mon} %e %R"
+    date = (Date.today - time.to_date).abs > 181 ? "#{mon} %e  %Y" : "#{mon} %e %R"
     time.strftime(date)
   end
 
-  def fomat_finfo_string(target, len)
-    target.ljust(len, " ")
-  end
-
-  def fomat_finfo_int(target, len)
-    target.rjust(len, " ")
-  end
-
-  # 長さが異なるので一旦配列化
   def finfo_ary(files)
     @nlink = []
     @uid = []
     @gid = []
     @size = []
 
-    files.map do |f| 
+    files.map do |f|
       stat = fstat(f)
 
       @nlink << stat.nlink.to_s
@@ -129,10 +119,9 @@ class FileInfo
   end
 
   def max_len(target)
-    target.sort_by(&:length).last.length
+    target.max_by(&:length).length
   end
 
-  # 最長のファイル名を求める
   def finfo_len
     @nlink_len = max_len(@nlink)
     @uid_len = max_len(@uid)
@@ -140,7 +129,6 @@ class FileInfo
     @size_len = max_len(@size)
   end
 
-  # 字詰めをあまり考えなくて良さそうなのでそのまま使う
   def file_info(file)
     stat = fstat(file)
 
