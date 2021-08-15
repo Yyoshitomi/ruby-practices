@@ -96,7 +96,7 @@ class FileInfo
   def ftime(time)
     # 6ヶ月以内のファイル/ディレクトリは月日時分
     # 6ヶ月以上前のファイル/ディレクトリは月日年
-    mon = time.strftime('%-m').ljust(2, ' ')
+    mon = time.strftime('%-m').rjust(2, ' ')
 
     date = (Date.today - time.to_date).abs > 181 ? "#{mon} %e  %Y" : "#{mon} %e %R"
     time.strftime(date)
