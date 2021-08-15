@@ -58,6 +58,8 @@ class Files
       col_count.times do |i|
         file = ary_row[i][n]
         export_files.push(file)
+
+        break if ary_row[i + 1].nil?
       end
     end
 
