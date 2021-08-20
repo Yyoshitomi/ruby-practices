@@ -22,7 +22,7 @@ else
   ARGV.map do |arg|
     if FileTest.file?(arg)
       texts << [File.read(arg), arg]
-    elsif
+    else
       wc = WordCount.new
       wc.print_error_message(arg)
 

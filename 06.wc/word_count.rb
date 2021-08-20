@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WordCount
   def line_count(text)
     text.split(/\R/).size
@@ -11,21 +13,19 @@ class WordCount
     text.bytesize
   end
 
-  def print_count(count)
-    print count.to_s.rjust(8, ' ')
+  def print_count(ary, options)
+    ary = [ary[0]] if options[:l]
+
+    ary.each { |count| print count.to_s.rjust(8, ' ') }
   end
 
   def print_name(name)
     print " #{name}\n"
   end
 
-  def print_total_count(l, w, b, options)
-    if options[:l]
-      print_count l.sum
-    else
-      [l, w, b].each { |x| print_count x.sum }
-    end
-
+  def print_total_count(line, word, byte, options)
+    ary = [line, word, byte].map(&:sum)
+    print_count(ary, options)
     print_name('total')
   end
 
