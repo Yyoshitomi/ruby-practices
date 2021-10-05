@@ -12,16 +12,16 @@ class PrintFile
     col_count = (`tput cols`.to_i / max_length) > col ? col : (`tput cols`.to_i / max_length)
 
     if col_count >= count
-      one_row(sorted_files, max_length)
+      display_row(sorted_files, max_length)
     else
       count_info = [max_length, count, col_count]
-      multi_rows(sorted_files, count_info)
+      display_rows(sorted_files, count_info)
     end
   end
 
   private
 
-  def one_row(files, len)
+  def display_row(files, len)
     space = ' ' * 11
 
     files.each do |file|
@@ -32,7 +32,7 @@ class PrintFile
     print "\n"
   end
 
-  def multi_rows(files, count_info)
+  def display_rows(files, count_info)
     max_length = count_info[0]
     count = count_info[1]
     col_count = count_info[2]
@@ -53,6 +53,6 @@ class PrintFile
     end
 
     file_table = exported_files.each_slice(col_count).to_a
-    file_table.each { |line| one_row(line, max_length) }
+    file_table.each { |line| display_row(line, max_length) }
   end
 end
