@@ -39,20 +39,20 @@ class PrintFile
 
     row = (count.to_f / col_count).ceil
 
-    export_files = []
+    exported_files = []
     ary_row = files.each_slice(row).to_a
 
     # ary_row内の各配列を先頭から並び替える
     row.times do |n|
       col_count.times do |i|
         file = ary_row[i][n]
-        export_files.push(file)
+        exported_files.push(file)
 
         break if ary_row[i + 1].nil?
       end
     end
 
-    rows = export_files.each_slice(col_count).to_a
+    rows = exported_files.each_slice(col_count).to_a
     rows.each { |line| one_row(line, max_length) }
   end
 end
