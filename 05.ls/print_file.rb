@@ -37,22 +37,22 @@ class PrintFile
     count = count_info[1]
     col_count = count_info[2]
 
-    row = (count.to_f / col_count).ceil
+    row_count = (count.to_f / col_count).ceil
 
     exported_files = []
-    ary_row = files.each_slice(row).to_a
+    rows = files.each_slice(row_count).to_a
 
-    # ary_row内の各配列を先頭から並び替える
-    row.times do |n|
+    # row内の各配列を先頭から並び替える
+    row_count.times do |n|
       col_count.times do |i|
-        file = ary_row[i][n]
+        file = rows[i][n]
         exported_files.push(file)
 
-        break if ary_row[i + 1].nil?
+        break if rows[i + 1].nil?
       end
     end
 
-    rows = exported_files.each_slice(col_count).to_a
-    rows.each { |line| one_row(line, max_length) }
+    file_table = exported_files.each_slice(col_count).to_a
+    file_table.each { |line| one_row(line, max_length) }
   end
 end
