@@ -24,9 +24,9 @@ class PrintFile
   def one_row(files, len)
     space = ' ' * 11
 
-    files.each do |f|
-      file = f.nil? ? space : f.ljust(len, ' ')
-      print file
+    files.each do |file|
+      file_name = file.nil? ? space : file.ljust(len, ' ')
+      print file_name
     end
 
     print "\n"

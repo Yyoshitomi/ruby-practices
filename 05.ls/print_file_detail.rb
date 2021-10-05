@@ -108,8 +108,8 @@ class PrintFileInfo
     @gid = []
     @size = []
 
-    files.map do |f|
-      stat = fstat(f)
+    files.map do |file|
+      stat = fstat(file)
 
       @nlink << stat.nlink.to_s
       @uid << Etc.getpwuid(stat.uid).name
