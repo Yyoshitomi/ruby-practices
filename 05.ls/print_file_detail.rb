@@ -3,7 +3,7 @@
 require 'date'
 require_relative 'fomat_files'
 
-class FileInfo
+class PrintFileInfo
   def output(path, opts)
     sorted_files = sorted_files(path, opts)
     path = nil if path.instance_of?(Array)
