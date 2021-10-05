@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'fomat_files'
+require_relative 'format_files'
 
 class PrintFile
   def output(files, opts)

@@ -3,14 +3,6 @@
 require_relative 'print_file'
 require_relative 'print_file_detail'
 
-def multi_dir(path, num)
-  print "\n" if num >= 1
-  puts "#{path}:"
-end
-
-def open_files(path)
-  Dir.entries(path)
-end
 
 def exists_opt_long(files, opts)
   if opts[:l]
@@ -23,7 +15,7 @@ def exists_opt_long(files, opts)
 end
 
 def sorted_files(files, opts)
-  files = open_files(files) if files.instance_of?(String)
+  files = Dir.entries(files) if files.instance_of?(String)
   # ファイルを並べ替え
   files.sort!
 

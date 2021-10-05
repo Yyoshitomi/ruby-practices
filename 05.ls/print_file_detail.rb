@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'date'
-require_relative 'fomat_files'
+require_relative 'format_files'
 
 class PrintFileInfo
   def output(path, opts)

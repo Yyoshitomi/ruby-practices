@@ -4,7 +4,7 @@
 
 require 'optparse'
 require 'etc'
-require_relative 'fomat_files'
+require_relative 'format_files'
 
 # オプション
 option = {}
@@ -40,7 +40,11 @@ else
     directories.sort.each_with_index do |dir, i|
       print "\n" if files != []
 
-      multi_dir(dir, i) if (i >= 1) || (files != [])
+      if (i >= 1) || (files != [])
+        print "\n" if i >= 1
+        puts "#{dir}:"
+      end
+
       exists_opt_long(dir, option)
     end
   end
