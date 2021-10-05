@@ -19,7 +19,7 @@ optparse.parse!(ARGV)
 # 指定されたディレクトリを呼ぶ
 # ディレクトリの指定がなければカレントディレクトリを呼ぶ
 if ARGV == []
-  exists_opt_long?(Dir.pwd, option)
+  exists_opt_long(Dir.pwd, option)
 else
   directories = []
   files = []
@@ -34,14 +34,14 @@ else
     end
   end
 
-  exists_opt_long?(files, option) if files != []
+  exists_opt_long(files, option) if files != []
 
   if directories != []
     directories.sort.each_with_index do |dir, i|
       print "\n" if files != []
 
       multi_dir(dir, i) if (i >= 1) || (files != [])
-      exists_opt_long?(dir, option)
+      exists_opt_long(dir, option)
     end
   end
 end

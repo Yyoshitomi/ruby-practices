@@ -12,7 +12,7 @@ def open_files(path)
   Dir.entries(path)
 end
 
-def exists_opt_long?(files, opts)
+def exists_opt_long(files, opts)
   if opts[:l]
     file_info = PrintFileInfo.new
     file_info.output(files, opts)
