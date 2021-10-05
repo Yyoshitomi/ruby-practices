@@ -14,8 +14,8 @@ class PrintFile
     if col_count >= count
       one_row(sorted_files, max_length)
     else
-      split_screen = [max_length, count, col_count]
-      multi_rows(sorted_files, split_screen)
+      count_info = [max_length, count, col_count]
+      multi_rows(sorted_files, count_info)
     end
   end
 
@@ -32,10 +32,10 @@ class PrintFile
     print "\n"
   end
 
-  def multi_rows(files, split_screen)
-    max_length = split_screen[0]
-    count = split_screen[1]
-    col_count = split_screen[2]
+  def multi_rows(files, count_info)
+    max_length = count_info[0]
+    count = count_info[1]
+    col_count = count_info[2]
 
     row = (count.to_f / col_count).ceil
 
