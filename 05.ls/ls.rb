@@ -6,6 +6,16 @@ require 'optparse'
 require 'etc'
 require_relative 'format_files'
 
+def exists_opt_long(files, opts)
+  if opts[:l]
+    file_info = PrintFileInfo.new
+    file_info.output(files, opts)
+  else
+    file = PrintFile.new
+    file.output(files, opts)
+  end
+end
+
 # オプション
 option = {}
 optparse = OptionParser.new do |opts|

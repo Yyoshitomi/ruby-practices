@@ -4,16 +4,6 @@ require_relative 'print_file'
 require_relative 'print_file_detail'
 
 
-def exists_opt_long(files, opts)
-  if opts[:l]
-    file_info = PrintFileInfo.new
-    file_info.output(files, opts)
-  else
-    file = PrintFile.new
-    file.output(files, opts)
-  end
-end
-
 def sorted_files(files, opts)
   files = Dir.entries(files) if files.instance_of?(String)
   # ファイルを並べ替え
