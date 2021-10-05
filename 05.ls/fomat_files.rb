@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'file'
+require_relative 'print_file'
 require_relative 'print_file_detail'
 
 def multi_dir(path, num)
@@ -17,7 +17,7 @@ def exists_opt_long?(files, opts)
     file_info = PrintFileInfo.new
     file_info.output(files, opts)
   else
-    file = Files.new
+    file = PrintFile.new
     file.output(files, opts)
   end
 end

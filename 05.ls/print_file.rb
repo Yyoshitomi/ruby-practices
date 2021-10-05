@@ -2,7 +2,7 @@
 
 require_relative 'fomat_files'
 
-class Files
+class PrintFile
   def output(files, opts)
     sorted_files = sorted_files(files, opts)
 
