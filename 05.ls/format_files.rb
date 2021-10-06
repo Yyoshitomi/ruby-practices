@@ -4,8 +4,13 @@ require_relative 'print_file'
 require_relative 'print_file_detail'
 
 
-def sorted_files(files, opts)
-  files = Dir.entries(files) if files.instance_of?(String)
+def sorted_files(files_or_path, opts)
+  files = if files_or_path.instance_of?(String)
+            Dir.entries(files_or_path)
+          else
+            files_or_path
+          end
+
   # ファイルを並べ替え
   files.sort!
 
