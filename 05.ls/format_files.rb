@@ -3,7 +3,6 @@
 require_relative 'print_file'
 require_relative 'print_file_detail'
 
-
 def sorted_files(files_or_path, opts)
   files = if files_or_path.instance_of?(String)
             Dir.entries(files_or_path)
