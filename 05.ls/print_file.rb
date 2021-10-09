@@ -4,18 +4,16 @@ require_relative 'format_files'
 
 class PrintFile
   def output(files, opts)
-    sorted_files = sorted_files(files, opts)
-
-    max_length = sorted_files.max_by(&:length).length + 2
-    count = sorted_files.count
-    col = 3
+    max_length = sorted_files(files, opts).max_by(&:length).length + 2
+    count = sorted_files(files, opts).count
+    col = 3ンン
     col_count = (`tput cols`.to_i / max_length) > col ? col : (`tput cols`.to_i / max_length)
 
     if col_count >= count
-      display_row(sorted_files, max_length)
+      display_row(sorted_files(files, opts), max_length)
     else
       count_info = [max_length, count, col_count]
-      display_rows(sorted_files, count_info)
+      display_rows(sorted_files(files, opts), count_info)
     end
   end
 
