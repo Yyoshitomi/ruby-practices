@@ -6,7 +6,7 @@ class PrintFile
   def output(files, opts)
     max_length = sorted_files(files, opts).max_by(&:length).length + 2
     count = sorted_files(files, opts).count
-    col = 3ンン
+    col = 3
     col_count = (`tput cols`.to_i / max_length) > col ? col : (`tput cols`.to_i / max_length)
 
     if col_count >= count
