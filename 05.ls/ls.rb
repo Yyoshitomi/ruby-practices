@@ -16,6 +16,11 @@ def exists_opt_long(files, opts)
   end
 end
 
+def print_directories_name(dir)
+  print "\n"
+  puts "#{dir}:"
+end
+
 # オプション
 option = {}
 optparse = OptionParser.new do |opts|
@@ -50,10 +55,7 @@ else
     directories.sort.each_with_index do |dir, i|
       print "\n" if files != []
 
-      if (i >= 1) || (files != [])
-        print "\n" if i >= 1
-        puts "#{dir}:"
-      end
+      print_directories_name(dir) if (i >= 1) || (files != [])
 
       exists_opt_long(dir, option)
     end
