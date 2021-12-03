@@ -19,7 +19,7 @@ def main
 
   # 指定されたディレクトリを呼ぶ
   # ディレクトリの指定がなければカレントディレクトリを呼ぶ
-  if ARGV == []
+  if ARGV.empty?
     exists_opt_long(Dir.pwd, option)
   else
     directories = []
