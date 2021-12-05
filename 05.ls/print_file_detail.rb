@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require 'date'
-require_relative 'format_files'
+require_relative 'file_sortable'
 
-class PrintFileInfo
+class PrintFileDetail
+  include FileSortable
+
   def output(files_or_path, opts)
-    files_or_path = nil if files_or_path.instance_of?(Array)
-    paths = sorted_files(files_or_path, opts).map { |file| File.expand_path(file, files_or_path) }
+    path = nil if files_or_path.instance_of?(Array)
+    paths = sorted_files(files_or_path, opts).map { |file| File.expand_path(file, path) }
 
     output_total_blocks(paths) if files_or_path.instance_of?(String)
 

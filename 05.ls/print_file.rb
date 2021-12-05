@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'format_files'
+require_relative 'file_sortable'
 
 class PrintFile
+  include FileSortable
+
   def output(files, opts)
     max_length = sorted_files(files, opts).max_by(&:length).length + 2
     count = sorted_files(files, opts).count

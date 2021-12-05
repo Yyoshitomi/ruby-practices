@@ -4,7 +4,8 @@
 
 require 'optparse'
 require 'etc'
-require_relative 'format_files'
+require_relative 'print_file'
+require_relative 'print_file_detail'
 
 def main
   # オプション
@@ -46,7 +47,7 @@ def exists_opt_long(files, opts)
 end
 
 def separate_directories_or_files(argv, directories, files)
-  argv.map do |arg|
+  argv.each do |arg|
     if FileTest.directory?(arg)
       directories << arg
     elsif FileTest.file?(arg)
