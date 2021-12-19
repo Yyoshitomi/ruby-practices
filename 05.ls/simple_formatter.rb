@@ -30,17 +30,15 @@ class SimpleFormatter
 
   def display_rows(files, max_length, file_count, col_count)
     row_count = (file_count.to_f / col_count).ceil
-
-    exported_files = []
     rows = files.each_slice(row_count).to_a
 
-    # row内の各配列を先頭から並び替える
-    row_count.times do |n|
-      col_count.times do |i|
-        file = rows[i][n]
+    exported_files = []
+    row_count.times do |row_idx|
+      col_count.times do |col_idx|
+        file = rows[col_idx][row_idx]
         exported_files.push(file)
 
-        break if rows[i + 1].nil?
+        break if rows[col_idx + 1].nil?
       end
     end
 

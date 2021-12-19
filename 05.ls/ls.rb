@@ -31,7 +31,7 @@ def main
 
     unless directories.empty?
       print "\n" unless files.empty?
-      print_directories_detail(directories, option)
+      print_directories_detail(directories, option, files.empty?)
     end
   end
 end
@@ -58,10 +58,10 @@ def separate_directories_or_files(argv, directories, files)
   end
 end
 
-def print_directories_detail(directories, option)
+def print_directories_detail(directories, option, files_exists)
   directories.sort.each_with_index do |dir, i|
     print "\n" unless i.zero?
-    puts "#{dir}:"
+    puts "#{dir}:" unless files_exists
     exists_opt_long(dir, option)
   end
 end
