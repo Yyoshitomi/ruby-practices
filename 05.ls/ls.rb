@@ -27,10 +27,10 @@ def main
     files = []
     separate_directories_or_files(ARGV, directories, files)
 
-    exists_opt_long(files, option) if files != []
+    exists_opt_long(files, option)
 
-    unless directories == []
-      print "\n" unless files == []
+    unless directories.empty?
+      print "\n" unless files.empty?
       print_directories_detail(directories, option)
     end
   end
@@ -60,14 +60,10 @@ end
 
 def print_directories_detail(directories, option)
   directories.sort.each_with_index do |dir, i|
-    print_directories_name(dir) if i >= 1
+    print "\n" unless i.zero?
+    puts "#{dir}:"
     exists_opt_long(dir, option)
   end
-end
-
-def print_directories_name(dir)
-  print "\n"
-  puts "#{dir}:"
 end
 
 main

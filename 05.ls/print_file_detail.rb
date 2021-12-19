@@ -7,10 +7,11 @@ class PrintFileDetail
   include FileSortable
 
   def output(files_or_path, opts)
-    path = nil if files_or_path.instance_of?(Array)
-    paths = sorted_files(files_or_path, opts).map { |file| File.expand_path(file, path) }
-
-    output_total_blocks(paths) if files_or_path.instance_of?(String)
+    paths = sorted_files(files_or_path, opts)
+    if files_or_path.instance_of?(String)
+      paths.map! { |file| File.expand_path(file, files_or_path) }
+      output_total_blocks(paths)
+    end
 
     fnlinks = file_nlinks(paths)
     fuids = file_uids(paths)
@@ -40,7 +41,7 @@ class PrintFileDetail
   # -lの総合ブロック数
   def output_total_blocks(paths)
     blocks = paths.map { |file| fstat(file).blocks }.sum
-    puts "total #{blocks}"
+    puts "total #{blocks}" unless blocks.zero?
   end
 
   # ファイルタイプ
