@@ -6,14 +6,13 @@ class SimpleFormatter
   include FileSortable
 
   def output(files, opts)
-    p files = sorted_files(files, opts)
+    files = sorted_files(files, opts)
     max_length = files.max_by(&:length).length + 2
-    count = files.count
+    file_count = files.count
     col = 3
     col_count = (`tput cols`.to_i / max_length) > col ? col : (`tput cols`.to_i / max_length)
 
-    count_info = [max_length, count, col_count]
-    display_rows(files, count_info)
+    display_rows(files, max_length, file_count, col_count)
   end
 
   private
@@ -29,12 +28,8 @@ class SimpleFormatter
     print "\n"
   end
 
-  def display_rows(files, count_info)
-    max_length = count_info[0]
-    count = count_info[1]
-    col_count = count_info[2]
-
-    row_count = (count.to_f / col_count).ceil
+  def display_rows(files, max_length, file_count, col_count)
+    row_count = (file_count.to_f / col_count).ceil
 
     exported_files = []
     rows = files.each_slice(row_count).to_a
