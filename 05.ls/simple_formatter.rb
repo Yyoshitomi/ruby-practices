@@ -2,20 +2,21 @@
 
 require_relative 'file_sortable'
 
-class PrintFile
+class SimpleFormatter
   include FileSortable
 
   def output(files, opts)
-    max_length = sorted_files(files, opts).max_by(&:length).length + 2
-    count = sorted_files(files, opts).count
+    files = sorted_files(files, opts)
+    max_length = files.max_by(&:length).length + 2
+    count = files.count
     col = 3
     col_count = (`tput cols`.to_i / max_length) > col ? col : (`tput cols`.to_i / max_length)
 
     if col_count >= count
-      display_row(sorted_files(files, opts), max_length)
+      display_row(files, max_length)
     else
       count_info = [max_length, count, col_count]
-      display_rows(sorted_files(files, opts), count_info)
+      display_rows(files, count_info)
     end
   end
 

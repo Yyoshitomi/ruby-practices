@@ -4,8 +4,8 @@
 
 require 'optparse'
 require 'etc'
-require_relative 'print_file'
-require_relative 'print_file_detail'
+require_relative 'simple_formatter'
+require_relative 'detailed_formatter'
 
 def main
   # オプション
@@ -38,10 +38,10 @@ end
 
 def exists_opt_long(files, opts)
   if opts[:l]
-    file_detail = PrintFileDetail.new
+    file_detail = DetailedFormatter.new
     file_detail.output(files, opts)
   else
-    file = PrintFile.new
+    file = SimpleFormatter.new
     file.output(files, opts)
   end
 end

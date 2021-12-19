@@ -3,7 +3,7 @@
 require 'date'
 require_relative 'file_sortable'
 
-class PrintFileDetail
+class DetailedFormatter
   include FileSortable
 
   def output(files_or_path, opts)
