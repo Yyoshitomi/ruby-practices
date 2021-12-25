@@ -6,6 +6,17 @@ require_relative 'file_sortable'
 class DetailedFormatter
   include FileSortable
 
+  STR_ROLE = {
+    '0' => '---',
+    '1' => '--x',
+    '2' => '-w-',
+    '3' => '-wx',
+    '4' => 'r--',
+    '5' => 'r-x',
+    '6' => 'rw-',
+    '7' => 'rwx'
+  }.freeze
+
   def output(files_or_path, opts)
     paths = sorted_files(files_or_path, opts)
     if files_or_path.instance_of?(String)
@@ -52,16 +63,7 @@ class DetailedFormatter
 
   # ファイル権限
   def str_role(num)
-    {
-      '0' => '---',
-      '1' => '--x',
-      '2' => '-w-',
-      '3' => '-wx',
-      '4' => 'r--',
-      '5' => 'r-x',
-      '6' => 'rw-',
-      '7' => 'rwx'
-    }[num]
+    STR_ROLE[num]
   end
 
   # ファイルの権限を検証
