@@ -64,16 +64,6 @@ class DetailedFormatter
     }[num]
   end
 
-  # sticky bitありの場合
-  def sticky_bit(role)
-    role[2] = role[2] == 'x' ? 't' : 'T'
-  end
-
-  # SUID,SGIDありの場合
-  def sid(role)
-    role[2] = role[2] == 'x' ? 's' : 'S'
-  end
-
   # ファイルの権限を検証
   def str_mode(nmode)
     mode = nmode.chars
@@ -81,15 +71,6 @@ class DetailedFormatter
     user = str_role(mode[1])
     group = str_role(mode[2])
     other = str_role(mode[3])
-
-    case mode[0]
-    when '1'
-      other = sticky_bit(othr)
-    when '2'
-      user = sid(user)
-    when '4'
-      group = sid(group)
-    end
 
     role = user + group + other
     role.ljust(11, ' ')
