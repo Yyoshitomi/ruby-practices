@@ -16,8 +16,6 @@ module FileSortable
                      files.reject { |file| file.start_with?('.') unless file.include?('/') }
                    end
 
-    sorted_files.reverse! if opts[:r]
-
-    sorted_files
+    opts[:r] ? sorted_files.reverse : sorted_files
   end
 end
