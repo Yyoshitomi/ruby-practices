@@ -21,13 +21,13 @@ def main
   # 指定されたディレクトリを呼ぶ
   # ディレクトリの指定がなければカレントディレクトリを呼ぶ
   if ARGV.empty?
-    exists_opt_long(Dir.pwd, option)
+    show_file_information(Dir.pwd, option)
   else
     directories = []
     files = []
     separate_directories_or_files(ARGV, directories, files)
 
-    exists_opt_long(files, option) unless files.empty?
+    show_file_information(files, option) unless files.empty?
 
     unless directories.empty?
       print "\n" unless files.empty?
@@ -36,7 +36,7 @@ def main
   end
 end
 
-def exists_opt_long(files, opts)
+def show_file_information(files, opts)
   if opts[:l]
     file_detail = DetailedFormatter.new
     file_detail.output(files, opts)
@@ -64,7 +64,7 @@ def print_directories_detail(directories, option, files_exists)
     if directories.count > 1 || files_exists == false
       puts "#{dir}:"
     end
-    exists_opt_long(dir, option)
+    show_file_information(dir, option)
   end
 end
 
