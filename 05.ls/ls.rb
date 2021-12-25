@@ -61,7 +61,9 @@ end
 def print_directories_detail(directories, option, files_exists)
   directories.sort.each_with_index do |dir, i|
     print "\n" unless i.zero?
-    puts "#{dir}:" unless directories.count == 1 || files_exists
+    if directories.count > 1 || files_exists == false
+      puts "#{dir}:"
+    end
     exists_opt_long(dir, option)
   end
 end
