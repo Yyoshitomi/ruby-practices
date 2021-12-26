@@ -10,10 +10,8 @@ module FileSortable
 
     sorted_files = files.sort!
 
-    if opts[:a]
-      sorted_files
-    else
-      sorted_files.reject { |file| file.start_with?('.') unless file.include?('/') }
+    if opts[:a].nil?
+      sorted_files.reject! { |file| file.start_with?('.') unless file.include?('/') }
     end
 
     opts[:r] ? sorted_files.reverse : sorted_files
