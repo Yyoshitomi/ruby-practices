@@ -18,7 +18,7 @@ class DetailedFormatter
   }.freeze
 
   def output(files_or_path, opts)
-    paths = sorted_files(files_or_path, opts)
+    paths = sort_files(files_or_path, opts)
     if files_or_path.instance_of?(String)
       paths.map! { |file| File.expand_path(file, files_or_path) }
       output_total_blocks(paths)
@@ -38,7 +38,7 @@ class DetailedFormatter
       print "#{fgids[i].ljust(max_len(fgids), ' ')}　"
       print "#{fsize[i].rjust(max_len(fsize), ' ')} "
       print "#{ftime(stat.mtime)} "
-      print "#{sorted_files(files_or_path, opts)[i]}\n"
+      print "#{sort_files(files_or_path, opts)[i]}\n"
     end
   end
 

@@ -6,7 +6,7 @@ class SimpleFormatter
   include FileSortable
 
   def output(files, opts)
-    files = sorted_files(files, opts)
+    files = sort_files(files, opts)
     max_length = files.max_by(&:length).length + 2
     file_count = files.count
     col = 3
