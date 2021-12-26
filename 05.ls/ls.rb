@@ -23,9 +23,7 @@ def main
   if ARGV.empty?
     show_file_information(Dir.pwd, option)
   else
-    directories = []
-    files = []
-    separate_directories_or_files(ARGV, directories, files)
+    directories, files = separate_directories_or_files(ARGV)
 
     show_file_information(files, option) unless files.empty?
 
@@ -46,7 +44,10 @@ def show_file_information(files, opts)
   end
 end
 
-def separate_directories_or_files(argv, directories, files)
+def separate_directories_or_files(argv)
+  directories = []
+  files = []
+
   argv.each do |arg|
     if FileTest.directory?(arg)
       directories << arg
@@ -56,6 +57,8 @@ def separate_directories_or_files(argv, directories, files)
       puts "ls: #{arg}: No such file or directory"
     end
   end
+
+  return directories, files
 end
 
 def print_directories_detail(directories, option, files_exists)
