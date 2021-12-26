@@ -5,15 +5,17 @@ require_relative 'file_sortable'
 class SimpleFormatter
   include FileSortable
 
+  COL = 3
+  COL.freeze
+
   def output(files, opts)
     files = sort_files(files, opts)
     max_length = files.max_by(&:length).length + 2
     file_count = files.count
-    col = 3
     max_size_divider = (`tput cols`.to_i / max_length)
-    col_count = max_size_divider > col ? col : max_size_divider
+    col_count = max_size_divider > COL ? COL : max_size_divider
 
-    display_rows(files, max_length, file_count, col_count, col)
+    display_rows(files, max_length, file_count, col_count)
   end
 
   private
@@ -27,11 +29,11 @@ class SimpleFormatter
     print "\n"
   end
 
-  def display_rows(files, max_length, file_count, col_count, col)
+  def display_rows(files, max_length, file_count, col_count)
     row_count = (file_count.to_f / col_count).ceil
     rows = files.each_slice(row_count).to_a
 
-    if col > rows[0].size && col > rows.size
+    if files.size >= COL && COL > rows[0].size && COL > rows.size
       file = rows[0].pop
       exported_files = rows.flatten
       exported_files.push(file)
