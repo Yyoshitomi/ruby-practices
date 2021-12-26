@@ -8,14 +8,14 @@ module FileSortable
               files_or_path
             end
 
-    files.sort!
+    sorted_files = files.sort!
 
-    sort_files = if opts[:a]
-                     files
-                   else
-                     files.reject { |file| file.start_with?('.') unless file.include?('/') }
-                   end
+    if opts[:a]
+      sorted_files
+    else
+      sorted_files.reject { |file| file.start_with?('.') unless file.include?('/') }
+    end
 
-    opts[:r] ? sort_files.reverse : sort_files
+    opts[:r] ? sorted_files.reverse : sorted_files
   end
 end
