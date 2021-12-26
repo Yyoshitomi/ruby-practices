@@ -58,7 +58,7 @@ def separate_directories_or_files(argv)
     end
   end
 
-  return directories, files
+  [directories, files]
 end
 
 def print_directories_detail(directories, option, files_empty)
