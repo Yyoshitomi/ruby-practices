@@ -10,7 +10,8 @@ class SimpleFormatter
     max_length = files.max_by(&:length).length + 2
     file_count = files.count
     col = 3
-    col_count = (`tput cols`.to_i / max_length) > col ? col : (`tput cols`.to_i / max_length)
+    max_size_divider = (`tput cols`.to_i / max_length)
+    col_count = max_size_divider > col ? col : max_size_divider
 
     display_rows(files, max_length, file_count, col_count)
   end
