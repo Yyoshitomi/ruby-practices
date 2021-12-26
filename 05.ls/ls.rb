@@ -34,13 +34,13 @@ def main
   end
 end
 
-def show_file_information(files, opts)
+def show_file_information(files_or_directories, opts)
   if opts[:l]
     file_detail = DetailedFormatter.new
-    file_detail.output(files, opts)
+    file_detail.output(files_or_directories, opts)
   else
     file = SimpleFormatter.new
-    file.output(files, opts)
+    file.output(files_or_directories, opts)
   end
 end
 
@@ -61,10 +61,10 @@ def separate_directories_or_files(argv)
   return directories, files
 end
 
-def print_directories_detail(directories, option, files_exists)
+def print_directories_detail(directories, option, files_empty)
   directories.sort.each_with_index do |dir, i|
     print "\n" unless i.zero?
-    puts "#{dir}:" if directories.count > 1 || files_exists == false
+    puts "#{dir}:" if directories.count > 1 || files_empty == false
     show_file_information(dir, option)
   end
 end
