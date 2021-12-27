@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
 require 'date'
-require_relative 'file_sortable'
 
 class DetailedFormatter
-  include FileSortable
-
   STR_ROLE = {
     '0' => '---',
     '1' => '--x',
@@ -17,28 +14,43 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(files_or_path, opts)
-    paths = sort_files(files_or_path, opts)
-    if files_or_path.instance_of?(String)
-      paths.map! { |file| File.expand_path(file, files_or_path) }
+  def output(files_or_directories, file_list, opts)
+    if files_or_directories.instance_of?(String)
+      paths = file_list.map { |file| File.expand_path(file, files_or_directories) }
       output_total_blocks(paths)
+    else
+      paths = file_list
     end
 
-    fnlinks = file_nlinks(paths)
-    fuids = file_uids(paths)
-    fgids = file_gids(paths)
-    fsize = file_size(paths)
-
+    file_info = []
     paths.each_with_index do |file, i|
       stat = fstat(file)
 
-      print "#{str_type(file)}#{str_mode(stat.mode.to_s(8)[-4, 4])}"
-      print "#{fnlinks[i].rjust(max_len(fnlinks), ' ')} "
-      print "#{fuids[i].ljust(max_len(fuids), ' ')}　"
-      print "#{fgids[i].ljust(max_len(fgids), ' ')}　"
-      print "#{fsize[i].rjust(max_len(fsize), ' ')} "
-      print "#{ftime(stat.mtime)} "
-      print "#{sort_files(files_or_path, opts)[i]}\n"
+      file_info << {
+        name: file_list[i],
+        type: str_type(file),
+        mode: str_mode(stat.mode.to_s(8)[-4, 4]),
+        nlink: fstat(file).nlink.to_s,
+        uid: Etc.getpwuid(fstat(file).uid).name,
+        gid: Etc.getgrgid(fstat(file).gid).name,
+        size: fstat(file).size.to_s,
+        time: ftime(stat.mtime)
+      }
+    end
+
+    max_len_nlinks = max_len(file_info.map { |file| file[:nlink] })
+    max_len_uids = max_len(file_info.map { |file| file[:uid] })
+    max_len_gids = max_len(file_info.map { |file| file[:gid] })
+    max_len_size = max_len(file_info.map { |file| file[:size] })
+
+    file_info.each do |file|
+      print "#{file[:type]}#{file[:mode]}"
+      print "#{file[:nlink].rjust(max_len_nlinks, ' ')} "
+      print "#{file[:uid].ljust(max_len_uids, ' ')}　"
+      print "#{file[:gid].ljust(max_len_gids, ' ')}　"
+      print "#{file[:size].rjust(max_len_size, ' ')} "
+      print "#{file[:time]} "
+      print "#{file[:name]}\n"
     end
   end
 
@@ -61,18 +73,13 @@ class DetailedFormatter
     type == 'file' ? '-' : type[0]
   end
 
-  # ファイル権限
-  def str_role(num)
-    STR_ROLE[num]
-  end
-
   # ファイルの権限を検証
   def str_mode(nmode)
     mode = nmode.chars
 
-    user = str_role(mode[1])
-    group = str_role(mode[2])
-    other = str_role(mode[3])
+    user = STR_ROLE[mode[1]]
+    group = STR_ROLE[mode[2]]
+    other = STR_ROLE[mode[3]]
 
     role = user + group + other
     role.ljust(11, ' ')
@@ -86,22 +93,6 @@ class DetailedFormatter
 
     date = (Date.today - time.to_date).abs > 181 ? "#{mon} %e  %Y" : "#{mon} %e %R"
     time.strftime(date)
-  end
-
-  def file_nlinks(files)
-    files.map { |file| fstat(file).nlink.to_s }
-  end
-
-  def file_uids(files)
-    files.map { |file| Etc.getpwuid(fstat(file).uid).name }
-  end
-
-  def file_gids(files)
-    files.map { |file| Etc.getgrgid(fstat(file).gid).name }
-  end
-
-  def file_size(files)
-    files.map { |file| fstat(file).size.to_s }
   end
 
   def max_len(target)
