@@ -34,13 +34,31 @@ def main
   end
 end
 
+def sort_files(files_or_directories, opts)
+  files = if files_or_directories.instance_of?(String)
+            Dir.entries(files_or_directories)
+          else
+            files_or_directories
+          end
+
+  sorted_files = files.sort!
+
+  if opts[:a].nil?
+    sorted_files.reject! { |file| file.start_with?('.') unless file.include?('/') }
+  end
+
+  opts[:r] ? sorted_files.reverse : sorted_files
+end
+
 def show_file_information(files_or_directories, opts)
-  if opts[:l]
+  file_list = sort_files(files_or_directories, opts)
+
+  if opts[:l] && file_list.empty? == false
     file_detail = DetailedFormatter.new
-    file_detail.output(files_or_directories, opts)
-  else
+    file_detail.output(files_or_directories, file_list, opts)
+  elsif file_list.empty? == false
     file = SimpleFormatter.new
-    file.output(files_or_directories, opts)
+    file.output(file_list, opts)
   end
 end
 

@@ -1,21 +1,16 @@
 # frozen_string_literal: true
 
-require_relative 'file_sortable'
-
 class SimpleFormatter
-  include FileSortable
-
   COL = 3
   COL.freeze
 
-  def output(files, opts)
-    files = sort_files(files, opts)
-    max_length = files.max_by(&:length).length + 2
-    file_count = files.count
+  def output(file_list, opts)
+    max_length = file_list.max_by(&:length).length + 2
+    file_count = file_list.count
     max_size_divider = (`tput cols`.to_i / max_length)
     col_count = max_size_divider > COL ? COL : max_size_divider
 
-    display_rows(files, max_length, file_count, col_count)
+    display_rows(file_list, max_length, file_count, col_count)
   end
 
   private
