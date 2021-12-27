@@ -34,34 +34,6 @@ def main
   end
 end
 
-def sort_files(files_or_directories, opts)
-  files = if files_or_directories.instance_of?(String)
-            Dir.entries(files_or_directories)
-          else
-            files_or_directories
-          end
-
-  sorted_files = files.sort!
-
-  if opts[:a].nil?
-    sorted_files.reject! { |file| file.start_with?('.') unless file.include?('/') }
-  end
-
-  opts[:r] ? sorted_files.reverse : sorted_files
-end
-
-def show_file_information(files_or_directories, opts)
-  file_list = sort_files(files_or_directories, opts)
-
-  if opts[:l] && file_list.empty? == false
-    file_detail = DetailedFormatter.new
-    file_detail.output(files_or_directories, file_list, opts)
-  elsif file_list.empty? == false
-    file = SimpleFormatter.new
-    file.output(file_list, opts)
-  end
-end
-
 def separate_directories_or_files(argv)
   directories = []
   files = []
@@ -80,11 +52,40 @@ def separate_directories_or_files(argv)
 end
 
 def print_directories_detail(directories, option, files_empty)
-  directories.sort.each_with_index do |dir, i|
+  sorted_directories = option[:r] ? directories.reverse : directories.sort
+  sorted_directories.each_with_index do |dir, i|
     print "\n" unless i.zero?
-    puts "#{dir}:" if directories.count > 1 || files_empty == false
+    puts "#{dir}:" if sorted_directories.count > 1 || files_empty == false
     show_file_information(dir, option)
   end
+end
+
+def show_file_information(files_or_directories, opts)
+  file_list = sort_files(files_or_directories, opts)
+
+  if opts[:l] && file_list.empty? == false
+    file_detail = DetailedFormatter.new
+    file_detail.output(files_or_directories, file_list, opts)
+  elsif file_list.empty? == false
+    file = SimpleFormatter.new
+    file.output(file_list, opts)
+  end
+end
+
+def sort_files(files_or_directories, opts)
+  files = if files_or_directories.instance_of?(String)
+            Dir.entries(files_or_directories)
+          else
+            files_or_directories
+          end
+
+  sorted_files = files.sort!
+
+  if opts[:a].nil?
+    sorted_files.reject! { |file| file.start_with?('.') unless file.include?('/') }
+  end
+
+  opts[:r] ? sorted_files.reverse : sorted_files
 end
 
 main
