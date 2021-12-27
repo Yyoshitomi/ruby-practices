@@ -14,7 +14,7 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(files_or_directories, file_list, opts)
+  def output(files_or_directories, file_list)
     if files_or_directories.instance_of?(String)
       paths = file_list.map { |file| File.expand_path(file, files_or_directories) }
       output_total_blocks(paths)
@@ -22,35 +22,18 @@ class DetailedFormatter
       paths = file_list
     end
 
-    file_info = []
-    paths.each_with_index do |file, i|
-      stat = fstat(file)
+    file_info = file_info(file_list, paths)
 
-      file_info << {
-        name: file_list[i],
-        type: str_type(file),
-        mode: str_mode(stat.mode.to_s(8)[-4, 4]),
-        nlink: fstat(file).nlink.to_s,
-        uid: Etc.getpwuid(fstat(file).uid).name,
-        gid: Etc.getgrgid(fstat(file).gid).name,
-        size: fstat(file).size.to_s,
-        time: ftime(stat.mtime)
-      }
-    end
-
-    max_len_nlinks = max_len(file_info.map { |file| file[:nlink] })
-    max_len_uids = max_len(file_info.map { |file| file[:uid] })
-    max_len_gids = max_len(file_info.map { |file| file[:gid] })
-    max_len_size = max_len(file_info.map { |file| file[:size] })
+    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = max_len(file_info)
 
     file_info.each do |file|
-      print "#{file[:type]}#{file[:mode]}"
-      print "#{file[:nlink].rjust(max_len_nlinks, ' ')} "
-      print "#{file[:uid].ljust(max_len_uids, ' ')}　"
-      print "#{file[:gid].ljust(max_len_gids, ' ')}　"
-      print "#{file[:size].rjust(max_len_size, ' ')} "
-      print "#{file[:time]} "
-      print "#{file[:name]}\n"
+      print "#{file['type']}#{file['mode']}"
+      print "#{file['nlink'].rjust(max_len_nlinks, ' ')} "
+      print "#{file['uid'].ljust(max_len_uids, ' ')}　"
+      print "#{file['gid'].ljust(max_len_gids, ' ')}　"
+      print "#{file['size'].rjust(max_len_size, ' ')} "
+      print "#{file['time']} "
+      print "#{file['name']}\n"
     end
   end
 
@@ -95,7 +78,30 @@ class DetailedFormatter
     time.strftime(date)
   end
 
-  def max_len(target)
-    target.max_by(&:length).length
+  def max_len(file_info)
+    %w[nlink uid gid size].map do |target|
+      target_list = file_info.map { |file| file[target] }
+      target_list.max_by(&:length).length
+    end
+  end
+
+  def file_info(file_list, paths)
+    file_info = []
+    paths.each_with_index do |file, i|
+      stat = fstat(file)
+
+      file_info << {
+        'name' => file_list[i],
+        'type' => str_type(file),
+        'mode' => str_mode(stat.mode.to_s(8)[-4, 4]),
+        'nlink' => fstat(file).nlink.to_s,
+        'uid' => Etc.getpwuid(fstat(file).uid).name,
+        'gid' => Etc.getgrgid(fstat(file).gid).name,
+        'size' => fstat(file).size.to_s,
+        'time' => ftime(stat.mtime)
+      }
+    end
+
+    file_info
   end
 end
