@@ -4,7 +4,7 @@ class SimpleFormatter
   COL = 3
   COL.freeze
 
-  def output(file_list, opts)
+  def output(file_list)
     max_length = file_list.max_by(&:length).length + 2
     file_count = file_list.count
     max_size_divider = (`tput cols`.to_i / max_length)

@@ -65,10 +65,10 @@ def show_file_information(files_or_directories, opts)
 
   if opts[:l] && file_list.empty? == false
     file_detail = DetailedFormatter.new
-    file_detail.output(files_or_directories, file_list, opts)
+    file_detail.output(files_or_directories, file_list)
   elsif file_list.empty? == false
     file = SimpleFormatter.new
-    file.output(file_list, opts)
+    file.output(file_list)
   end
 end
 
