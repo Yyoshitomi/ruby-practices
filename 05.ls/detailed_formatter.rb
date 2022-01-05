@@ -15,7 +15,7 @@ class DetailedFormatter
   }.freeze
 
   def output(files_or_directories, file_list)
-    if files_or_directories.instance_of?(String)
+    if FileTest.directory?(files_or_directories[0])
       paths = file_list.map { |file| File.expand_path(file, files_or_directories) }
       output_total_blocks(paths)
     else

@@ -74,7 +74,7 @@ def show_file_information(files_or_directories, opts)
 end
 
 def sort_files(files_or_directories, opts)
-  files = if files_or_directories.instance_of?(String)
+  files = if FileTest.directory?(files_or_directories[0])
             Dir.entries(files_or_directories)
           else
             files_or_directories
