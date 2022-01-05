@@ -22,18 +22,18 @@ class DetailedFormatter
       paths = file_list
     end
 
-    file_info = get_finfo(file_list, paths)
+    file_info = get_finfo(paths)
 
     max_len_nlinks, max_len_uids, max_len_gids, max_len_size = get_max_len(file_info)
 
     file_info.each do |file|
-      print "#{file['type']}#{file['mode']}"
-      print "#{file['nlink'].rjust(max_len_nlinks, ' ')} "
-      print "#{file['uid'].ljust(max_len_uids, ' ')}　"
-      print "#{file['gid'].ljust(max_len_gids, ' ')}　"
-      print "#{file['size'].rjust(max_len_size, ' ')} "
-      print "#{file['time']} "
-      print "#{file['name']}\n"
+      print "#{file[:type]}#{file[:mode]}"
+      print "#{file[:nlink].rjust(max_len_nlinks, ' ')} "
+      print "#{file[:uid].ljust(max_len_uids, ' ')}　"
+      print "#{file[:gid].ljust(max_len_gids, ' ')}　"
+      print "#{file[:size].rjust(max_len_size, ' ')} "
+      print "#{file[:time]} "
+      print "#{file[:name]}\n"
     end
   end
 
@@ -78,26 +78,26 @@ class DetailedFormatter
   end
 
   def get_max_len(file_info)
-    %w[nlink uid gid size].map do |target|
+    %i[nlink uid gid size].map do |target|
       target_list = file_info.map { |file| file[target] }
       target_list.max_by(&:length).length
     end
   end
 
-  def get_finfo(file_list, paths)
+  def get_finfo(paths)
     file_info = []
-    paths.each_with_index do |file, i|
+    paths.map do |file|
       stat = get_fstat(file)
 
       file_info << {
-        'name' => file_list[i],
-        'type' => get_str_ftype(file),
-        'mode' => get_frole(stat.mode.to_s(8)[-4, 4]),
-        'nlink' => get_fstat(file).nlink.to_s,
-        'uid' => Etc.getpwuid(get_fstat(file).uid).name,
-        'gid' => Etc.getgrgid(get_fstat(file).gid).name,
-        'size' => get_fstat(file).size.to_s,
-        'time' => get_ftime(stat.mtime)
+        name: File.basename(file),
+        type: get_str_ftype(file),
+        mode: get_frole(stat.mode.to_s(8)[-4, 4]),
+        nlink: get_fstat(file).nlink.to_s,
+        uid: Etc.getpwuid(get_fstat(file).uid).name,
+        gid: Etc.getgrgid(get_fstat(file).gid).name,
+        size: get_fstat(file).size.to_s,
+        time: get_ftime(stat.mtime)
       }
     end
 
