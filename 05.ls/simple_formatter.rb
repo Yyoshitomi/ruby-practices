@@ -2,7 +2,6 @@
 
 class SimpleFormatter
   COL = 3
-  COL.freeze
 
   def output(file_list)
     max_length = file_list.max_by(&:length).length + 2
