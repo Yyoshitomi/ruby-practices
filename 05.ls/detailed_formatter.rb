@@ -22,9 +22,9 @@ class DetailedFormatter
       paths = file_list
     end
 
-    file_info = file_info(file_list, paths)
+    file_info = get_finfo(file_list, paths)
 
-    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = max_len(file_info)
+    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = get_max_len(file_info)
 
     file_info.each do |file|
       print "#{file['type']}#{file['mode']}"
@@ -39,25 +39,24 @@ class DetailedFormatter
 
   private
 
-  def fstat(file)
-    # ファイルタイプによってlstatかstatでファイル情報を取得する
+  def get_fstat(file)
     File.ftype(file) == 'link' ? File.lstat(file) : File.stat(file)
   end
 
   # -lの総合ブロック数
   def output_total_blocks(paths)
-    blocks = paths.map { |file| fstat(file).blocks }.sum
+    blocks = paths.map { |file| get_fstat(file).blocks }.sum
     puts "total #{blocks}" unless blocks.zero?
   end
 
   # ファイルタイプ
-  def str_type(file)
+  def get_str_ftype(file)
     type = File.ftype(file)
     type == 'file' ? '-' : type[0]
   end
 
   # ファイルの権限を検証
-  def str_mode(nmode)
+  def get_frole(nmode)
     mode = nmode.chars
 
     user = STR_ROLE[mode[1]]
@@ -69,7 +68,7 @@ class DetailedFormatter
   end
 
   # 作成時間
-  def ftime(time)
+  def get_ftime(time)
     # 6ヶ月以内のファイル/ディレクトリは月日時分
     # 6ヶ月以上前のファイル/ディレクトリは月日年
     mon = time.strftime('%-m').rjust(2, ' ')
@@ -78,27 +77,27 @@ class DetailedFormatter
     time.strftime(date)
   end
 
-  def max_len(file_info)
+  def get_max_len(file_info)
     %w[nlink uid gid size].map do |target|
       target_list = file_info.map { |file| file[target] }
       target_list.max_by(&:length).length
     end
   end
 
-  def file_info(file_list, paths)
+  def get_finfo(file_list, paths)
     file_info = []
     paths.each_with_index do |file, i|
-      stat = fstat(file)
+      stat = get_fstat(file)
 
       file_info << {
         'name' => file_list[i],
-        'type' => str_type(file),
-        'mode' => str_mode(stat.mode.to_s(8)[-4, 4]),
-        'nlink' => fstat(file).nlink.to_s,
-        'uid' => Etc.getpwuid(fstat(file).uid).name,
-        'gid' => Etc.getgrgid(fstat(file).gid).name,
-        'size' => fstat(file).size.to_s,
-        'time' => ftime(stat.mtime)
+        'type' => get_str_ftype(file),
+        'mode' => get_frole(stat.mode.to_s(8)[-4, 4]),
+        'nlink' => get_fstat(file).nlink.to_s,
+        'uid' => Etc.getpwuid(get_fstat(file).uid).name,
+        'gid' => Etc.getgrgid(get_fstat(file).gid).name,
+        'size' => get_fstat(file).size.to_s,
+        'time' => get_ftime(stat.mtime)
       }
     end
 
