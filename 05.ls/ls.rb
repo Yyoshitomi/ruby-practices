@@ -52,10 +52,10 @@ def separate_directories_or_files(argv)
 end
 
 def print_directories_detail(directories, option, files_empty)
-  sorted_directories = option[:r] ? directories.reverse : directories.sort
+  sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
   sorted_directories.each_with_index do |dir, i|
     print "\n" unless i.zero?
-    puts "#{dir}:" if sorted_directories.count > 1 || files_empty == false
+    puts "#{dir}:" if sorted_directories.count > 1 || !files_empty
     show_file_information(dir, option)
   end
 end
@@ -63,10 +63,11 @@ end
 def show_file_information(files_or_directories, opts)
   file_list = sort_files(files_or_directories, opts)
 
-  if opts[:l] && file_list.empty? == false
+  case [file_list.empty?, opts[:l]]
+  when [false, true]
     file_detail = DetailedFormatter.new
     file_detail.output(files_or_directories, file_list)
-  elsif file_list.empty? == false
+  when [false, false]
     file = SimpleFormatter.new
     file.output(file_list)
   end
@@ -79,7 +80,7 @@ def sort_files(files_or_directories, opts)
             files_or_directories
           end
 
-  sorted_files = files.sort!
+  sorted_files = files.sort
 
   if opts[:a].nil?
     sorted_files.reject! { |file| file.start_with?('.') unless file.include?('/') }
