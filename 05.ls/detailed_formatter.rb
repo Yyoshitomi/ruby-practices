@@ -3,7 +3,7 @@
 require 'date'
 
 class DetailedFormatter
-  STR_ROLE = {
+  FILE_ROLE = {
     '0' => '---',
     '1' => '--x',
     '2' => '-w-',
@@ -14,15 +14,11 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(files_or_directories, file_list)
-    if FileTest.directory?(files_or_directories[0])
-      paths = file_list.map { |file| File.expand_path(file, files_or_directories) }
-      output_total_blocks(paths)
-    else
-      paths = file_list
-    end
+  def output(files, directory = nil)
+    file_path_list = files.map { |file| File.expand_path(file, directory) }.zip(files).to_h
+    file_info = get_finfo(file_path_list)
 
-    file_info = get_finfo(paths)
+    puts "total #{file_info.sum { |hash| hash[:block] }}"
 
     max_len_nlinks, max_len_uids, max_len_gids, max_len_size = get_max_len(file_info)
 
@@ -43,12 +39,6 @@ class DetailedFormatter
     File.ftype(file) == 'link' ? File.lstat(file) : File.stat(file)
   end
 
-  # -lの総合ブロック数
-  def output_total_blocks(paths)
-    blocks = paths.map { |file| get_fstat(file).blocks }.sum
-    puts "total #{blocks}" unless blocks.zero?
-  end
-
   # ファイルタイプ
   def get_str_ftype(file)
     type = File.ftype(file)
@@ -59,9 +49,9 @@ class DetailedFormatter
   def get_frole(nmode)
     mode = nmode.chars
 
-    user = STR_ROLE[mode[1]]
-    group = STR_ROLE[mode[2]]
-    other = STR_ROLE[mode[3]]
+    user = FILE_ROLE[mode[1]]
+    group = FILE_ROLE[mode[2]]
+    other = FILE_ROLE[mode[3]]
 
     role = user + group + other
     role.ljust(11, ' ')
@@ -84,20 +74,21 @@ class DetailedFormatter
     end
   end
 
-  def get_finfo(paths)
+  def get_finfo(file_path_list)
     file_info = []
-    paths.map do |file|
-      stat = get_fstat(file)
+    file_path_list.map do |path, file_name|
+      stat = get_fstat(path)
 
       file_info << {
-        name: File.basename(file),
-        type: get_str_ftype(file),
+        name: file_name,
+        type: get_str_ftype(path),
         mode: get_frole(stat.mode.to_s(8)[-4, 4]),
-        nlink: get_fstat(file).nlink.to_s,
-        uid: Etc.getpwuid(get_fstat(file).uid).name,
-        gid: Etc.getgrgid(get_fstat(file).gid).name,
-        size: get_fstat(file).size.to_s,
-        time: get_ftime(stat.mtime)
+        nlink: get_fstat(path).nlink.to_s,
+        uid: Etc.getpwuid(get_fstat(path).uid).name,
+        gid: Etc.getgrgid(get_fstat(path).gid).name,
+        size: get_fstat(path).size.to_s,
+        time: get_ftime(stat.mtime),
+        block: get_fstat(path).blocks
       }
     end
 

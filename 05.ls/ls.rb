@@ -18,10 +18,9 @@ def main
 
   optparse.parse!(ARGV)
 
-  # 指定されたディレクトリを呼ぶ
-  # ディレクトリの指定がなければカレントディレクトリを呼ぶ
   if ARGV.empty?
-    show_file_information(Dir.pwd, option)
+    # ディレクトリやファイルの指定がなければカレントディレクトリからファイル一覧を取得する
+    show_file_information(Dir.entries('.'), option)
   else
     directories, files = separate_directories_or_files(ARGV)
 
@@ -52,7 +51,7 @@ def print_directories_detail(directories, option, files_empty)
   sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
   sorted_directories.each_with_index do |dir, i|
     puts "#{dir}:" if !files_empty || sorted_directories.count > 1
-    show_file_information(dir, option)
+    show_file_information(Dir.entries(dir), option, dir)
 
     break if i == sorted_directories.length - 1
 
@@ -60,26 +59,25 @@ def print_directories_detail(directories, option, files_empty)
   end
 end
 
-def show_file_information(files_or_directories, opts)
-  file_list = sort_files(files_or_directories, opts)
+def show_file_information(files, opts, dirname = nil)
+  sorted_files = sort_files(files, opts)
 
-  case [file_list.empty?, opts[:l]]
-  when [false, true]
+  # ファイルが存在しない場合は表示しない
+  # リーダブルコードp.91参考
+  exit if sorted_files.empty?
+
+  if opts[:l]
     file_detail = DetailedFormatter.new
-    file_detail.output(files_or_directories, file_list)
-  when [false, nil]
+    file_detail.output(sorted_files, dirname)
+  else
     file = SimpleFormatter.new
-    file.output(file_list)
+    file.output(sorted_files)
   end
+rescue SystemExit
+  # do nothing(rubocop対応)
 end
 
-def sort_files(files_or_directories, opts)
-  files = if FileTest.directory?(files_or_directories[0])
-            Dir.entries(files_or_directories)
-          else
-            files_or_directories
-          end
-
+def sort_files(files, opts)
   sorted_files = files.sort
 
   sorted_files.reject! { |file| File.basename(file).start_with?('.') } if opts[:a].nil?
