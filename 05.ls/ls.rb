@@ -8,7 +8,6 @@ require_relative 'simple_formatter'
 require_relative 'detailed_formatter'
 
 def main
-  # オプション
   option = {}
   optparse = OptionParser.new do |opts|
     opts.on('-a', '--all', 'output all files') { option[:a] = true }

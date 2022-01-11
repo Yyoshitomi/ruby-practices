@@ -39,13 +39,11 @@ class DetailedFormatter
     File.ftype(file) == 'link' ? File.lstat(file) : File.stat(file)
   end
 
-  # ファイルタイプ
   def get_str_ftype(file)
     type = File.ftype(file)
     type == 'file' ? '-' : type[0]
   end
 
-  # ファイルの権限を検証
   def get_frole(nmode)
     mode = nmode.chars
 
@@ -57,7 +55,6 @@ class DetailedFormatter
     role.ljust(11, ' ')
   end
 
-  # 作成時間
   def get_ftime(time)
     # 6ヶ月以内のファイル/ディレクトリは月日時分
     # 6ヶ月以上前のファイル/ディレクトリは月日年
