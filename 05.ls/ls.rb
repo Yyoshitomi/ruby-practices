@@ -62,9 +62,8 @@ end
 def show_file_information(files, opts, dirname = nil)
   sorted_files = sort_files(files, opts)
 
-  # ファイルが存在しない場合は表示しない
-  # リーダブルコードp.91参考
-  exit if sorted_files.empty?
+  # 表示するファイルが存在しない場合は表示しない
+  return if sorted_files.empty?
 
   if opts[:l]
     file_detail = DetailedFormatter.new
@@ -73,8 +72,6 @@ def show_file_information(files, opts, dirname = nil)
     file = SimpleFormatter.new
     file.output(sorted_files)
   end
-rescue SystemExit
-  # do nothing(rubocop対応)
 end
 
 def sort_files(files, opts)
