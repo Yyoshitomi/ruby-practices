@@ -17,7 +17,7 @@ class DetailedFormatter
   def output(sorted_files, directory_nil)
     file_info = build_finfo_hash(sorted_files, directory_nil)
 
-    puts "total #{file_info.sum { |hash| hash[:block] }}"
+    puts "total #{file_info.sum { |hash| hash[:block] }}" unless directory_nil
 
     max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(file_info)
 
