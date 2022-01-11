@@ -58,7 +58,7 @@ class DetailedFormatter
   def format_ftime(time)
     # 6ヶ月以内のファイル/ディレクトリは月日時分
     # 6ヶ月以上前のファイル/ディレクトリは月日年
-    date = (Date.today - time.to_date).abs > 181 ? "%_2m %e  %Y" : "%_2m %e %R"
+    date = (Date.today - time.to_date).abs > 181 ? '%_2m %e  %Y' : '%_2m %e %R'
     time.strftime(date)
   end
 
