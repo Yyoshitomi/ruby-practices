@@ -63,7 +63,6 @@ def print_files_or_directory_information(files_or_directory, opts)
     files = opts[:a] ? Dir.glob(directory, File::FNM_DOTMATCH) : Dir.glob(directory)
   else
     files = files_or_directory
-    files.reject! { |file| File.basename(file).start_with?('.') } if opts[:a].nil?
   end
 
   return if files.empty?
