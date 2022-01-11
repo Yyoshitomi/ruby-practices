@@ -16,11 +16,11 @@ class DetailedFormatter
 
   def output(files, directory = nil)
     file_path_list = files.map { |file| File.expand_path(file, directory) }.zip(files).to_h
-    file_info = get_finfo(file_path_list)
+    file_info = build_finfo_hash(file_path_list)
 
     puts "total #{file_info.sum { |hash| hash[:block] }}"
 
-    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = get_max_len(file_info)
+    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(file_info)
 
     file_info.each do |file|
       print "#{file[:type]}#{file[:mode]}"
@@ -35,16 +35,16 @@ class DetailedFormatter
 
   private
 
-  def get_fstat(file)
+  def select_fstat(file)
     File.ftype(file) == 'link' ? File.lstat(file) : File.stat(file)
   end
 
-  def get_str_ftype(file)
+  def select_ftype(file)
     type = File.ftype(file)
     type == 'file' ? '-' : type[0]
   end
 
-  def get_frole(nmode)
+  def format_frole(nmode)
     mode = nmode.chars
 
     user = FILE_ROLE[mode[1]]
@@ -62,31 +62,28 @@ class DetailedFormatter
     time.strftime(date)
   end
 
-  def get_max_len(file_info)
+  def build_max_length_array(file_info)
     %i[nlink uid gid size].map do |target|
       target_list = file_info.map { |file| file[target] }
       target_list.max_by(&:length).length
     end
   end
 
-  def get_finfo(file_path_list)
-    file_info = []
+  def build_finfo_hash(file_path_list)
     file_path_list.map do |path, file_name|
-      stat = get_fstat(path)
+      stat = select_fstat(path)
 
-      file_info << {
+      {
         name: file_name,
-        type: get_str_ftype(path),
-        mode: get_frole(stat.mode.to_s(8)[-4, 4]),
-        nlink: get_fstat(path).nlink.to_s,
-        uid: Etc.getpwuid(get_fstat(path).uid).name,
-        gid: Etc.getgrgid(get_fstat(path).gid).name,
-        size: get_fstat(path).size.to_s,
+        type: select_ftype(path),
+        mode: format_frole(stat.mode.to_s(8)[-4, 4]),
+        nlink: select_fstat(path).nlink.to_s,
+        uid: Etc.getpwuid(select_fstat(path).uid).name,
+        gid: Etc.getgrgid(select_fstat(path).gid).name,
+        size: select_fstat(path).size.to_s,
         time: format_ftime(stat.mtime),
-        block: get_fstat(path).blocks
+        block: select_fstat(path).blocks
       }
     end
-
-    file_info
   end
 end
