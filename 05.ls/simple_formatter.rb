@@ -5,13 +5,13 @@ require 'io/console'
 class SimpleFormatter
   COL = 3
 
-  def output(file_list)
-    max_length = file_list.max_by(&:length).length + 2
-    file_count = file_list.count
+  def output(sorted_files)
+    max_length = sorted_files.max_by(&:length).length + 2
+    file_count = sorted_files.count
     max_size_divider = (IO.console.winsize[1] / max_length)
     col_count = max_size_divider > COL ? COL : max_size_divider
 
-    display_rows(file_list, max_length, file_count, col_count)
+    display_rows(sorted_files, max_length, file_count, col_count)
   end
 
   private

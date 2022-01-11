@@ -14,9 +14,8 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(files, directory = nil)
-    file_path_list = files.map { |file| File.expand_path(file, directory) }.zip(files).to_h
-    file_info = build_finfo_hash(file_path_list)
+  def output(sorted_files, directory_nil)
+    file_info = build_finfo_hash(sorted_files, directory_nil)
 
     puts "total #{file_info.sum { |hash| hash[:block] }}"
 
@@ -69,20 +68,20 @@ class DetailedFormatter
     end
   end
 
-  def build_finfo_hash(file_path_list)
-    file_path_list.map do |path, file_name|
-      stat = select_fstat(path)
+  def build_finfo_hash(sorted_files, directory_nil)
+    sorted_files.map do |file|
+      stat = select_fstat(file)
 
       {
-        name: file_name,
-        type: select_ftype(path),
+        name: directory_nil ? file : File.basename(file),
+        type: select_ftype(file),
         mode: format_frole(stat.mode.to_s(8)[-4, 4]),
-        nlink: select_fstat(path).nlink.to_s,
-        uid: Etc.getpwuid(select_fstat(path).uid).name,
-        gid: Etc.getgrgid(select_fstat(path).gid).name,
-        size: select_fstat(path).size.to_s,
+        nlink: select_fstat(file).nlink.to_s,
+        uid: Etc.getpwuid(select_fstat(file).uid).name,
+        gid: Etc.getgrgid(select_fstat(file).gid).name,
+        size: select_fstat(file).size.to_s,
         time: format_ftime(stat.mtime),
-        block: select_fstat(path).blocks
+        block: select_fstat(file).blocks
       }
     end
   end

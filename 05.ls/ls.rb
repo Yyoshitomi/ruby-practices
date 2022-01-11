@@ -19,13 +19,24 @@ def main
 
   if ARGV.empty?
     # ディレクトリやファイルの指定がなければカレントディレクトリからファイル一覧を取得する
-    show_file_information(Dir.entries('.'), option)
+    print_files_or_directory_information(Dir.pwd, option)
   else
     directories, files = separate_directories_or_files(ARGV)
 
-    show_file_information(files, option) unless files.empty?
+    print_files_or_directory_information(files, option) unless files.empty?
     print "\n" unless files.empty? || directories.empty?
-    print_directories_detail(directories, option, files.empty?) unless directories.empty?
+
+    unless directories.empty?
+      sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
+      sorted_directories.each_with_index do |dir, i|
+        puts "#{dir}:" if !files.empty? || sorted_directories.count > 1
+        print_files_or_directory_information(dir, option)
+
+        break if i == sorted_directories.length - 1
+
+        print "\n"
+      end
+    end
   end
 end
 
@@ -46,39 +57,27 @@ def separate_directories_or_files(argv)
   [directories, files]
 end
 
-def print_directories_detail(directories, option, files_empty)
-  sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
-  sorted_directories.each_with_index do |dir, i|
-    puts "#{dir}:" if !files_empty || sorted_directories.count > 1
-    show_file_information(Dir.entries(dir), option, dir)
-
-    break if i == sorted_directories.length - 1
-
-    print "\n"
+def print_files_or_directory_information(files_or_directory, opts)
+  if FileTest.directory?(files_or_directory[0])
+    directory = "#{File.expand_path(files_or_directory)}/*"
+    files = opts[:a] ? Dir.glob(directory, File::FNM_DOTMATCH) : Dir.glob(directory)
+  else
+    files = files_or_directory
+    files.reject! { |file| File.basename(file).start_with?('.') } if opts[:a].nil?
   end
-end
 
-def show_file_information(files, opts, dirname = nil)
-  sorted_files = sort_files(files, opts)
+  return if files.empty?
 
-  # 表示するファイルが存在しない場合は表示しない
-  return if sorted_files.empty?
+  sorted_files = opts[:r] ? files.sort.reverse : files.sort
 
   if opts[:l]
-    file_detail = DetailedFormatter.new
-    file_detail.output(sorted_files, dirname)
+    file_info = DetailedFormatter.new
+    file_info.output(sorted_files, directory.nil?)
   else
-    file = SimpleFormatter.new
-    file.output(sorted_files)
+    sorted_files.map! { |file| File.basename(file) } if directory
+    file_info = SimpleFormatter.new
+    file_info.output(sorted_files)
   end
-end
-
-def sort_files(files, opts)
-  sorted_files = files.sort
-
-  sorted_files.reject! { |file| File.basename(file).start_with?('.') } if opts[:a].nil?
-
-  opts[:r] ? sorted_files.reverse : sorted_files
 end
 
 main
