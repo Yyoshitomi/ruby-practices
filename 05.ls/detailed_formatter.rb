@@ -55,7 +55,7 @@ class DetailedFormatter
     role.ljust(11, ' ')
   end
 
-  def get_ftime(time)
+  def format_ftime(time)
     # 6ヶ月以内のファイル/ディレクトリは月日時分
     # 6ヶ月以上前のファイル/ディレクトリは月日年
     mon = time.strftime('%-m').rjust(2, ' ')
@@ -84,7 +84,7 @@ class DetailedFormatter
         uid: Etc.getpwuid(get_fstat(path).uid).name,
         gid: Etc.getgrgid(get_fstat(path).gid).name,
         size: get_fstat(path).size.to_s,
-        time: get_ftime(stat.mtime),
+        time: format_ftime(stat.mtime),
         block: get_fstat(path).blocks
       }
     end
