@@ -28,8 +28,9 @@ class SimpleFormatter
   def display_rows(files, max_length, file_count, col_count)
     row_count = (file_count.to_f / col_count).ceil
     rows = files.each_slice(row_count).to_a
+    status_display_just_for_line = files.count >= COL && COL > rows[0].size && COL > rows.size
 
-    if files.size >= COL && COL > rows[0].size && COL > rows.size
+    if status_display_just_for_line
       file = rows[0].pop
       exported_files = rows.flatten
       exported_files.push(file)
