@@ -19,30 +19,20 @@ def main
 
   if ARGV.empty?
     # ディレクトリやファイルの指定がなければカレントディレクトリからファイル一覧を取得する
-    print_files_or_directory_information(Dir.pwd, option)
+    print_files_information(Dir.pwd, option)
   else
     directories, files = separate_directories_or_files(ARGV)
 
-    print_files_or_directory_information(files, option) unless files.empty?
+    print_files_information(files, nil, option) unless files.empty?
     print "\n" unless files.empty? || directories.empty?
-
-    unless directories.empty?
-      sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
-      sorted_directories.each_with_index do |dir, i|
-        puts "#{dir}:" if !files.empty? || sorted_directories.count > 1
-        print_files_or_directory_information(dir, option)
-
-        break if i == sorted_directories.length - 1
-
-        print "\n"
-      end
-    end
+    print_directories(directories, option, files.empty?) unless directories.empty?
   end
 end
 
 def separate_directories_or_files(argv)
   directories = []
   files = []
+  error_argv = []
 
   argv.each do |arg|
     if FileTest.directory?(arg)
@@ -50,23 +40,31 @@ def separate_directories_or_files(argv)
     elsif FileTest.file?(arg)
       files << arg
     else
-      puts "ls: #{arg}: No such file or directory"
+      error_argv << arg
     end
   end
+
+  error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" } unless error_argv.empty?
 
   [directories, files]
 end
 
-def print_files_or_directory_information(files_or_directory, opts)
-  if FileTest.directory?(files_or_directory[0])
-    directory = "#{File.expand_path(files_or_directory)}/*"
-    files = opts[:a] ? Dir.glob(directory, File::FNM_DOTMATCH) : Dir.glob(directory)
-  else
-    files = files_or_directory
+def print_directories(directories, option, files_empty)
+  sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
+  sorted_directories.each do |dir|
+    puts "#{dir}:" if !files_empty || sorted_directories.count > 1
+
+    expand_directory = "#{File.expand_path(dir)}/*"
+    files = option[:a] ? Dir.glob(expand_directory, File::FNM_DOTMATCH) : Dir.glob(expand_directory)
+
+    print "\n" unless dir == sorted_directories.last
+    next if files.empty?
+
+    print_files_information(files, true, option)
   end
+end
 
-  return if files.empty?
-
+def print_files_information(files, directory, opts)
   sorted_files = opts[:r] ? files.sort.reverse : files.sort
 
   if opts[:l]
