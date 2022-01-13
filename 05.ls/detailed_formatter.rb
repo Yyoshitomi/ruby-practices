@@ -15,20 +15,20 @@ class DetailedFormatter
   }.freeze
 
   def output(sorted_files, directory_nil)
-    file_info = build_finfo_hash(sorted_files, directory_nil)
+    finfo_hash = build_finfo_hash(sorted_files, directory_nil)
 
-    puts "total #{file_info.sum { |hash| hash[:block] }}" unless directory_nil
+    puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" unless directory_nil
 
-    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(file_info)
+    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(finfo_hash)
 
-    file_info.each do |file|
-      print "#{file[:type]}#{file[:mode]}"
-      print "#{file[:nlink].rjust(max_len_nlinks, ' ')} "
-      print "#{file[:uid].ljust(max_len_uids, ' ')}　"
-      print "#{file[:gid].ljust(max_len_gids, ' ')}　"
-      print "#{file[:size].rjust(max_len_size, ' ')} "
-      print "#{file[:time]} "
-      print "#{file[:name]}\n"
+    finfo_hash.each do |finfo|
+      print "#{finfo[:type]}#{finfo[:mode]}"
+      print "#{finfo[:nlink].rjust(max_len_nlinks, ' ')} "
+      print "#{finfo[:uid].ljust(max_len_uids, ' ')}　"
+      print "#{finfo[:gid].ljust(max_len_gids, ' ')}　"
+      print "#{finfo[:size].rjust(max_len_size, ' ')} "
+      print "#{finfo[:time]} "
+      puts finfo[:name]
     end
   end
 
@@ -57,19 +57,19 @@ class DetailedFormatter
   def format_ftime(time)
     # 6ヶ月以内のファイル/ディレクトリは月日時分
     # 6ヶ月以上前のファイル/ディレクトリは月日年
-    date = (Date.today - time.to_date).abs > 181 ? '%_2m %e  %Y' : '%_2m %e %R'
-    time.strftime(date)
+    format = (Date.today - time.to_date).abs > 181 ? '%_2m %e  %Y' : '%_2m %e %R'
+    time.strftime(format)
   end
 
-  def build_max_length_array(file_info)
+  def build_max_length_array(finfo_hash)
     %i[nlink uid gid size].map do |target|
-      target_list = file_info.map { |file| file[target] }
+      target_list = finfo_hash.map { |finfo| finfo[target] }
       target_list.max_by(&:length).length
     end
   end
 
-  def build_finfo_hash(sorted_files, directory_nil)
-    sorted_files.map do |file|
+  def build_finfo_hash(files, directory_nil)
+    files.map do |file|
       stat = select_fstat(file)
 
       {
