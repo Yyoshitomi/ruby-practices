@@ -14,10 +14,10 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(sorted_files, directory_nil)
-    finfo_hash = build_finfo_hash(sorted_files, directory_nil)
+  def output(files, directory_exists)
+    finfo_hash = build_finfo_hash(files, directory_exists)
 
-    puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" unless directory_nil
+    puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" if directory_exists
 
     max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(finfo_hash)
 
@@ -68,12 +68,12 @@ class DetailedFormatter
     end
   end
 
-  def build_finfo_hash(files, directory_nil)
+  def build_finfo_hash(files, directory_exists)
     files.map do |file|
       stat = select_fstat(file)
 
       {
-        name: directory_nil ? file : File.basename(file),
+        name: directory_exists ? File.basename(file) : file,
         type: select_ftype(file),
         mode: format_frole(stat.mode.to_s(8)[-4, 4]),
         nlink: select_fstat(file).nlink.to_s,

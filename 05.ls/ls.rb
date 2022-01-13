@@ -24,7 +24,7 @@ def main
     error_argv, files, directories = separate_directories_or_files(ARGV)
 
     error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" } unless error_argv.empty?
-    print_files_information(files, nil, option)
+    print_files_information(files, false, option)
     print "\n" unless files.empty? || directories.empty?
     print_directories(directories, option, files.empty?)
   end
@@ -54,8 +54,8 @@ def print_directories(directories, option, files_empty)
     # ファイルとディレクトリ、ディレクトリ複数を指定された場合はディレクトリ名を表示する
     puts "#{dir}:" if !files_empty || sorted_directories.count > 1
 
-    expand_directory = "#{File.expand_path(dir)}/*"
-    opened_files = option[:a] ? Dir.glob(expand_directory, File::FNM_DOTMATCH) : Dir.glob(expand_directory)
+    pattern = "#{File.expand_path(dir)}/*"
+    opened_files = option[:a] ? Dir.glob(pattern, File::FNM_DOTMATCH) : Dir.glob(pattern)
 
     print_files_information(opened_files, true, option)
     # 複数ディレクトリが指定された場合は、次のディレクトリとの間に改行を挿入する
@@ -63,20 +63,20 @@ def print_directories(directories, option, files_empty)
   end
 end
 
-def print_files_information(files, directory, opts)
+def print_files_information(files, directory_exists, option)
   # ファイル一覧が空の場合は何もせず、
   # 複数ディレクトリ指定時はprint_directoriesでディレクトリ名のみ表示
   return if files.empty?
 
-  sorted_files = opts[:r] ? files.sort.reverse : files.sort
+  sorted_files = option[:r] ? files.sort.reverse : files.sort
 
-  if opts[:l]
-    file_info = DetailedFormatter.new
-    file_info.output(sorted_files, directory.nil?)
+  if option[:l]
+    formatter = DetailedFormatter.new
+    formatter.output(sorted_files, directory_exists)
   else
-    sorted_files.map! { |file| File.basename(file) } if directory
-    file_info = SimpleFormatter.new
-    file_info.output(sorted_files)
+    sorted_files.map! { |file| File.basename(file) } if directory_exists
+    formatter = SimpleFormatter.new
+    formatter.output(sorted_files)
   end
 end
 
