@@ -21,13 +21,12 @@ def main
     # ディレクトリやファイルの指定がなければカレントディレクトリからファイル一覧を取得する
     print_directories([Dir.pwd], option, true)
   else
-    directories, files, error_argv = separate_directories_or_files(ARGV)
+    error_argv, files, directories = separate_directories_or_files(ARGV)
 
-    error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" } unless error_argv.empty?
-
-    print_files_information(files, nil, option) unless files.empty?
+    error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" }
+    print_files_information(files, nil, option)
     print "\n" unless files.empty? || directories.empty?
-    print_directories(directories, option, files.empty?) unless directories.empty?
+    print_directories(directories, option, files.empty?)
   end
 end
 
@@ -46,7 +45,7 @@ def separate_directories_or_files(argv)
     end
   end
 
-  [directories, files, error_argv]
+  [error_argv, files, directories]
 end
 
 def print_directories(directories, option, files_empty)
@@ -58,9 +57,6 @@ def print_directories(directories, option, files_empty)
     expand_directory = "#{File.expand_path(dir)}/*"
     opened_files = option[:a] ? Dir.glob(expand_directory, File::FNM_DOTMATCH) : Dir.glob(expand_directory)
 
-    # 表示するファイルが存在しない場合はディレクトリ名のみ表示して抜ける
-    next if opened_files.empty?
-
     print_files_information(opened_files, true, option)
     # 複数ディレクトリが指定された場合は、次のディレクトリとの間に改行を挿入する
     print "\n" unless dir == sorted_directories.last
@@ -68,6 +64,10 @@ def print_directories(directories, option, files_empty)
 end
 
 def print_files_information(files, directory, opts)
+  # ファイル一覧が空の場合は何もしない
+  # 複数ディレクトリ指定時はprint_directoriesでディレクトリ名のみ表示
+  return if files.empty?
+
   sorted_files = opts[:r] ? files.sort.reverse : files.sort
 
   if opts[:l]
