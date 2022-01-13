@@ -23,7 +23,7 @@ def main
   else
     error_argv, files, directories = separate_directories_or_files(ARGV)
 
-    error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" }
+    error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" } unless error_argv.empty?
     print_files_information(files, nil, option)
     print "\n" unless files.empty? || directories.empty?
     print_directories(directories, option, files.empty?)
@@ -64,7 +64,7 @@ def print_directories(directories, option, files_empty)
 end
 
 def print_files_information(files, directory, opts)
-  # ファイル一覧が空の場合は何もしない
+  # ファイル一覧が空の場合は何もせず、
   # 複数ディレクトリ指定時はprint_directoriesでディレクトリ名のみ表示
   return if files.empty?
 
