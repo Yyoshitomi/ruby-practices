@@ -19,9 +19,11 @@ def main
 
   if ARGV.empty?
     # ディレクトリやファイルの指定がなければカレントディレクトリからファイル一覧を取得する
-    print_files_information(Dir.pwd, option)
+    print_directories([Dir.pwd], option, true)
   else
-    directories, files = separate_directories_or_files(ARGV)
+    directories, files, error_argv = separate_directories_or_files(ARGV)
+
+    error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" } unless error_argv.empty?
 
     print_files_information(files, nil, option) unless files.empty?
     print "\n" unless files.empty? || directories.empty?
@@ -44,23 +46,24 @@ def separate_directories_or_files(argv)
     end
   end
 
-  error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" } unless error_argv.empty?
-
-  [directories, files]
+  [directories, files, error_argv]
 end
 
 def print_directories(directories, option, files_empty)
   sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
   sorted_directories.each do |dir|
+    # ファイルとディレクトリ、ディレクトリ複数を指定された場合はディレクトリ名を表示する
     puts "#{dir}:" if !files_empty || sorted_directories.count > 1
 
     expand_directory = "#{File.expand_path(dir)}/*"
-    files = option[:a] ? Dir.glob(expand_directory, File::FNM_DOTMATCH) : Dir.glob(expand_directory)
+    opened_files = option[:a] ? Dir.glob(expand_directory, File::FNM_DOTMATCH) : Dir.glob(expand_directory)
 
+    # 表示するファイルが存在しない場合はディレクトリ名のみ表示して抜ける
+    next if opened_files.empty?
+
+    print_files_information(opened_files, true, option)
+    # 複数ディレクトリが指定された場合は、次のディレクトリとの間に改行を挿入する
     print "\n" unless dir == sorted_directories.last
-    next if files.empty?
-
-    print_files_information(files, true, option)
   end
 end
 
