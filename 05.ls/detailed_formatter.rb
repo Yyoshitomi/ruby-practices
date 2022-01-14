@@ -34,10 +34,6 @@ class DetailedFormatter
 
   private
 
-  def select_fstat(file)
-    File.ftype(file) == 'link' ? File.lstat(file) : File.stat(file)
-  end
-
   def select_ftype(file)
     type = File.ftype(file)
     type == 'file' ? '-' : type[0]
@@ -70,18 +66,18 @@ class DetailedFormatter
 
   def build_finfo_hash(files, directory_exists)
     files.map do |file|
-      stat = select_fstat(file)
+      stat = File.stat(file)
 
       {
         name: directory_exists ? File.basename(file) : file,
         type: select_ftype(file),
         mode: format_frole(stat.mode.to_s(8)[-4, 4]),
-        nlink: select_fstat(file).nlink.to_s,
-        uid: Etc.getpwuid(select_fstat(file).uid).name,
-        gid: Etc.getgrgid(select_fstat(file).gid).name,
-        size: select_fstat(file).size.to_s,
+        nlink: stat.nlink.to_s,
+        uid: Etc.getpwuid(stat.uid).name,
+        gid: Etc.getgrgid(stat.gid).name,
+        size: stat.size.to_s,
         time: format_ftime(stat.mtime),
-        block: select_fstat(file).blocks
+        block: stat.blocks
       }
     end
   end
