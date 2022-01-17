@@ -18,7 +18,7 @@ class DetailedFormatter
     file_groups.each_with_index do |file_group, i|
       print_dirname_long(file_group, file_groups.count) do
         sorted_files = option[:r] ? file_group[:files].sort.reverse : file_group[:files].sort
-        finfo_hash = build_finfo_hash(sorted_files, file_group[:directory])
+        finfo_hash = build_finfo_hash_list(sorted_files, file_group[:directory])
 
         puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" unless file_group[:directory].nil?
 
@@ -78,7 +78,7 @@ class DetailedFormatter
     end
   end
 
-  def build_finfo_hash(files, directory)
+  def build_finfo_hash_list(files, directory)
     files.map do |file|
       stat = File.stat(file)
 
