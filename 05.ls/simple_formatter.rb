@@ -5,18 +5,18 @@ require 'io/console'
 class SimpleFormatter
   COL = 3
 
-  def output(files_list, option)
-    max_length = build_max_length(files_list)
-    files_list.each do |hash|
-      print_dirname(hash[:directory], files_list) do
-        next if hash[:files].empty?
+  def output(file_groups, option)
+    max_length = build_max_length(file_groups)
+    file_groups.each do |file_group|
+      print_dirname(file_group[:directory], file_groups) do
+        next if file_group[:files].empty?
 
-        hash[:files].map! { |file| File.basename(file) } unless hash[:directory].nil?
+        file_group[:files].map! { |file| File.basename(file) } unless file_group[:directory].nil?
 
         max_size_divider = (IO.console.winsize[1] / max_length)
         col_count = max_size_divider > COL ? COL : max_size_divider
 
-        sorted_files = option[:r] ? hash[:files].sort.reverse : hash[:files].sort
+        sorted_files = option[:r] ? file_group[:files].sort.reverse : file_group[:files].sort
         display_rows(sorted_files, max_length, col_count)
       end
     end
@@ -24,12 +24,12 @@ class SimpleFormatter
 
   private
 
-  def build_max_length(files_list)
+  def build_max_length(file_groups)
     max_length = 0
-    files_list.each do |hash|
-      next if hash[:files].empty?
+    file_groups.each do |file_group|
+      next if file_group[:files].empty?
 
-      fname_list = hash[:directory].nil? ? hash[:files] : hash[:files].map { |file| File.basename(file) }
+      fname_list = file_group[:directory].nil? ? file_group[:files] : file_group[:files].map { |file| File.basename(file) }
       fname_max_length = fname_list.max_by(&:length).length + 2
       max_length = max_length > fname_max_length ? max_length : fname_max_length
     end
@@ -37,12 +37,12 @@ class SimpleFormatter
     max_length
   end
 
-  def print_dirname(dirname, files_list)
-    print dirname if files_list.count > 1
+  def print_dirname(dirname, file_groups)
+    print dirname if file_groups.count > 1
 
     yield
 
-    print "\n" unless dirname == files_list.last[:directory]
+    print "\n" unless dirname == file_groups.last[:directory]
   end
 
   def display_row(files, length)

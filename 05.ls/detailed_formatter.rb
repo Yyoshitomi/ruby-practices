@@ -14,13 +14,13 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(files_list, option)
-    files_list.each do |files|
-      print_dirname_long(files[:directory], files[:files].empty?, files_list) do
-        sorted_files = option[:r] ? files[:files].sort.reverse : files[:files].sort
-        finfo_hash = build_finfo_hash(sorted_files, files[:directory])
+  def output(file_groups, option)
+    file_groups.each do |file_group|
+      print_dirname_long(file_group[:directory], file_group[:files].empty?, file_groups) do
+        sorted_files = option[:r] ? file_group[:files].sort.reverse : file_group[:files].sort
+        finfo_hash = build_finfo_hash(sorted_files, file_group[:directory])
 
-        puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" unless files[:directory].nil?
+        puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" unless file_group[:directory].nil?
 
         max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(finfo_hash)
 
@@ -34,7 +34,7 @@ class DetailedFormatter
           puts finfo[:name]
         end
       end
-      break if files == files_list.last
+      break if file_group == file_groups.last
 
       print "\n"
     end
@@ -42,8 +42,8 @@ class DetailedFormatter
 
   private
 
-  def print_dirname_long(dirname, files_empty, files_list)
-    print dirname if files_list.count > 1
+  def print_dirname_long(dirname, files_empty, file_groups)
+    print dirname if file_groups.count > 1
     return if files_empty
 
     yield

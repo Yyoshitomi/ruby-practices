@@ -17,21 +17,21 @@ def main
 
   optparse.parse!(ARGV)
 
-  files_list = []
+  file_groups = []
   if ARGV.empty?
     # ディレクトリやファイルの指定がなければカレントディレクトリからファイル一覧を取得する
-    sort_directories([Dir.pwd], option, files_list)
+    sort_directories([Dir.pwd], option, file_groups)
   else
     error_argv, files, directories = separate_directories_or_files(ARGV)
 
     error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" }
 
-    files_list << { directory: nil, files: files } unless files.empty?
-    sort_directories(directories, option, files_list)
+    file_groups << { directory: nil, files: files } unless files.empty?
+    sort_directories(directories, option, file_groups)
   end
 
   formatter = option[:l] ? DetailedFormatter.new : SimpleFormatter.new
-  formatter.output(files_list, option)
+  formatter.output(file_groups, option)
 end
 
 def separate_directories_or_files(argv)
@@ -52,13 +52,13 @@ def separate_directories_or_files(argv)
   [error_argv, files, directories]
 end
 
-def sort_directories(directories, option, files_list)
+def sort_directories(directories, option, file_groups)
   sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
   sorted_directories.each do |dir|
     pattern = "#{File.expand_path(dir)}/*"
     opened_files = option[:a] ? Dir.glob(pattern, File::FNM_DOTMATCH) : Dir.glob(pattern)
 
-    files_list << { directory: "#{dir}:\n", files: opened_files }
+    file_groups << { directory: "#{dir}:\n", files: opened_files }
   end
 end
 
