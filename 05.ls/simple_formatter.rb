@@ -44,23 +44,34 @@ class SimpleFormatter
 
   # in_groupsメソッドを参考
   # https://github.com/rails/rails/blob/fbe2433be6e052a1acac63c7faf287c52ed3c5ba/activesupport/lib/active_support/core_ext/array/grouping.rb#L62-L86
+  # in_groupsメソッドでは指定数分に配列をできるだけ均等に分割するが、
+  # 1 4 6
+  # 2 5 7
+  # 3
+  # lsコマンドでは右側から敷き詰めてファイル名を表示するので残数を考慮して配列のサイズを計算する
+  # 1 4 7
+  # 2 5
+  # 3 6
   def make_cols(col_count, files)
-    division = files.count / col_count
-    modulo = files.count % col_count
+    files_count = files.count
+    division = files_count / col_count
+    modulo = files_count % col_count
 
     col_array = []
     start = 0
+
     pre_length = 0
     left_over = 0
+
     col_count.times do |i|
       length = division + (modulo.positive? && modulo > i ? 1 : 0)
-      length += (left_over > pre_length && pre_length > length ? 1 : 0)
+      length += pre_length > length && left_over > pre_length ? 1 : 0
 
       col_array << files.slice(start, length)
 
       start += length
       pre_length = length
-      left_over = (files.count - start)
+      left_over = files_count - start
     end
 
     col_array
