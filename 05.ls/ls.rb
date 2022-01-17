@@ -58,7 +58,7 @@ def sort_directories(directories, option, file_groups)
     pattern = "#{File.expand_path(dir)}/*"
     opened_files = option[:a] ? Dir.glob(pattern, File::FNM_DOTMATCH) : Dir.glob(pattern)
 
-    file_groups << { directory: "#{dir}:\n", files: opened_files }
+    file_groups << { directory: "#{dir}:", files: opened_files }
   end
 end
 

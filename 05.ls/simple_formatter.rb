@@ -38,7 +38,7 @@ class SimpleFormatter
   end
 
   def print_dirname(dirname, file_groups)
-    print dirname if file_groups.count > 1
+    puts dirname if file_groups.count > 1 && !dirname.nil?
 
     yield
 

@@ -43,7 +43,7 @@ class DetailedFormatter
   private
 
   def print_dirname_long(dirname, files_empty, file_groups)
-    print dirname if file_groups.count > 1
+    puts dirname if file_groups.count > 1 && !dirname.nil?
     return if files_empty
 
     yield
