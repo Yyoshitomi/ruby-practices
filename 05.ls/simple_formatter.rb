@@ -7,8 +7,8 @@ class SimpleFormatter
 
   def output(file_groups, option)
     max_length = build_max_length(file_groups)
-    file_groups.each do |file_group|
-      print_dirname(file_group[:directory], file_groups) do
+    file_groups.each_with_index do |file_group, i|
+      print_dirname(file_group[:directory], i, file_groups.count) do
         next if file_group[:files].empty?
 
         files = file_group[:directory].nil? ? file_group[:files] : file_group[:files].map { |file| File.basename(file) }
@@ -37,12 +37,12 @@ class SimpleFormatter
     max_length
   end
 
-  def print_dirname(dirname, file_groups)
-    puts dirname if file_groups.count > 1 && !dirname.nil?
+  def print_dirname(dirname, i, file_groups_count)
+    puts dirname if i.positive?
 
     yield
 
-    print "\n" unless dirname == file_groups.last[:directory]
+    print "\n" unless i == file_groups_count - 1
   end
 
   def display_row(files, length)

@@ -15,8 +15,8 @@ class DetailedFormatter
   }.freeze
 
   def output(file_groups, option)
-    file_groups.each do |file_group|
-      print_dirname_long(file_group[:directory], file_group[:files].empty?, file_groups) do
+    file_groups.each_with_index do |file_group, i|
+      print_dirname_long(file_group, file_groups.count) do
         sorted_files = option[:r] ? file_group[:files].sort.reverse : file_group[:files].sort
         finfo_hash = build_finfo_hash(sorted_files, file_group[:directory])
 
@@ -34,17 +34,16 @@ class DetailedFormatter
           puts finfo[:name]
         end
       end
-      break if file_group == file_groups.last
 
-      print "\n"
+      print "\n" if i != file_groups.count - 1
     end
   end
 
   private
 
-  def print_dirname_long(dirname, files_empty, file_groups)
-    puts dirname if file_groups.count > 1 && !dirname.nil?
-    return if files_empty
+  def print_dirname_long(file_group, file_groups_count)
+    puts file_group[:directory] if file_groups_count > 1 && !file_group[:directory].nil?
+    return if file_group[:files].empty?
 
     yield
   end
