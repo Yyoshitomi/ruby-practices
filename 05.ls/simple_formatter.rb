@@ -11,12 +11,12 @@ class SimpleFormatter
       print_dirname(file_group[:directory], file_groups) do
         next if file_group[:files].empty?
 
-        file_group[:files].map! { |file| File.basename(file) } unless file_group[:directory].nil?
+        files = file_group[:directory].nil? ? file_group[:files] : file_group[:files].map { |file| File.basename(file) }
 
         max_size_divider = (IO.console.winsize[1] / max_length)
         col_count = max_size_divider > COL ? COL : max_size_divider
 
-        sorted_files = option[:r] ? file_group[:files].sort.reverse : file_group[:files].sort
+        sorted_files = option[:r] ? files.sort.reverse : files.sort
         display_rows(sorted_files, max_length, col_count)
       end
     end
