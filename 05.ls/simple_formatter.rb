@@ -5,15 +5,45 @@ require 'io/console'
 class SimpleFormatter
   COL = 3
 
-  def output(files)
-    max_length = files.max_by(&:length).length + 2
-    max_size_divider = (IO.console.winsize[1] / max_length)
-    col_count = max_size_divider > COL ? COL : max_size_divider
+  def output(files_list, option)
+    max_length = build_max_length(files_list)
+    files_list.each do |hash|
+      print_dirname(hash[:directory], files_list) do
+        next if hash[:files].empty?
 
-    display_rows(files, max_length, col_count)
+        hash[:files].map! { |file| File.basename(file) } unless hash[:directory].nil?
+
+        max_size_divider = (IO.console.winsize[1] / max_length)
+        col_count = max_size_divider > COL ? COL : max_size_divider
+
+        sorted_files = option[:r] ? hash[:files].sort.reverse : hash[:files].sort
+        display_rows(sorted_files, max_length, col_count)
+      end
+    end
   end
 
   private
+
+  def build_max_length(files_list)
+    max_length = 0
+    files_list.each do |hash|
+      next if hash[:files].empty?
+
+      fname_list = hash[:directory].nil? ? hash[:files] : hash[:files].map { |file| File.basename(file) }
+      fname_max_length = fname_list.max_by(&:length).length + 2
+      max_length = max_length > fname_max_length ? max_length : fname_max_length
+    end
+
+    max_length
+  end
+
+  def print_dirname(dirname, files_list)
+    print dirname if files_list.count > 1
+
+    yield
+
+    print "\n" unless dirname == files_list.last[:directory]
+  end
 
   def display_row(files, length)
     files.each do |file|
@@ -48,7 +78,7 @@ class SimpleFormatter
   # 1 4 6
   # 2 5 7
   # 3
-  # lsコマンドでは右側から敷き詰めてファイル名を表示するので残数を考慮して配列のサイズを計算する
+  # lsコマンドでは右側から敷き詰めてファイル名を表示するのでファイルの残数を考慮して配列のサイズを計算する
   # 1 4 7
   # 2 5
   # 3 6

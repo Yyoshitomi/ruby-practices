@@ -14,25 +14,40 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(files, directory_exists)
-    finfo_hash = build_finfo_hash(files, directory_exists)
+  def output(files_list, option)
+    files_list.each do |files|
+      print_dirname_long(files[:directory], files[:files].empty?, files_list) do
+        sorted_files = option[:r] ? files[:files].sort.reverse : files[:files].sort
+        finfo_hash = build_finfo_hash(sorted_files, files[:directory])
 
-    puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" if directory_exists
+        puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" unless files[:directory].nil?
 
-    max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(finfo_hash)
+        max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(finfo_hash)
 
-    finfo_hash.each do |finfo|
-      print "#{finfo[:type]}#{finfo[:mode]}"
-      print "#{finfo[:nlink].rjust(max_len_nlinks, ' ')} "
-      print "#{finfo[:uid].ljust(max_len_uids, ' ')}　"
-      print "#{finfo[:gid].ljust(max_len_gids, ' ')}　"
-      print "#{finfo[:size].rjust(max_len_size, ' ')} "
-      print "#{finfo[:time]} "
-      puts finfo[:name]
+        finfo_hash.each do |finfo|
+          print "#{finfo[:type]}#{finfo[:mode]}"
+          print "#{finfo[:nlink].rjust(max_len_nlinks, ' ')} "
+          print "#{finfo[:uid].ljust(max_len_uids, ' ')}　"
+          print "#{finfo[:gid].ljust(max_len_gids, ' ')}　"
+          print "#{finfo[:size].rjust(max_len_size, ' ')} "
+          print "#{finfo[:time]} "
+          puts finfo[:name]
+        end
+      end
+      break if files == files_list.last
+
+      print "\n"
     end
   end
 
   private
+
+  def print_dirname_long(dirname, files_empty, files_list)
+    print dirname if files_list.count > 1
+    return if files_empty
+
+    yield
+  end
 
   def select_ftype(file)
     type = File.ftype(file)
@@ -64,12 +79,12 @@ class DetailedFormatter
     end
   end
 
-  def build_finfo_hash(files, directory_exists)
+  def build_finfo_hash(files, directory)
     files.map do |file|
       stat = File.stat(file)
 
       {
-        name: directory_exists ? File.basename(file) : file,
+        name: directory.nil? ? file : File.basename(file),
         type: select_ftype(file),
         mode: format_frole(stat.mode.to_s(8)[-4, 4]),
         nlink: stat.nlink.to_s,
