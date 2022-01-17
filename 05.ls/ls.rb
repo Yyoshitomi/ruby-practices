@@ -24,7 +24,7 @@ def main
   else
     error_argv, files, directories = separate_directories_or_files(ARGV)
 
-    error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" } unless error_argv.empty?
+    error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" }
 
     files_list << { directory: nil, files: files } unless files.empty?
     sort_directories(directories, option, files_list)
