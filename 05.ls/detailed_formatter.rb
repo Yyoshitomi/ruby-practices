@@ -14,54 +14,32 @@ class DetailedFormatter
     '7' => 'rwx'
   }.freeze
 
-  def output(file_groups, option)
-    file_groups.each_with_index do |file_group, i|
-      print_dirname_long(file_group, file_groups.count) do
-        sorted_files = option[:r] ? file_group[:files].sort.reverse : file_group[:files].sort
-        finfo_hash = build_finfo_hash_list(sorted_files, file_group[:directory])
+  def output(file_group)
+    total_block = file_group[:files].sum { |file| File.stat(file).blocks }
+    puts "total #{total_block}" if file_group[:directory].nil?
 
-        puts "total #{finfo_hash.sum { |finfo| finfo[:block] }}" unless file_group[:directory].nil?
-
-        max_len_nlinks, max_len_uids, max_len_gids, max_len_size = build_max_length_array(finfo_hash)
-
-        finfo_hash.each do |finfo|
-          print "#{finfo[:type]}#{finfo[:mode]}"
-          print "#{finfo[:nlink].rjust(max_len_nlinks, ' ')} "
-          print "#{finfo[:uid].ljust(max_len_uids, ' ')}　"
-          print "#{finfo[:gid].ljust(max_len_gids, ' ')}　"
-          print "#{finfo[:size].rjust(max_len_size, ' ')} "
-          print "#{finfo[:time]} "
-          puts finfo[:name]
-        end
-      end
-
-      print "\n" if i != file_groups.count - 1
-    end
+    finfo_hash = build_finfo_hash(file_group[:files], file_group[:directory])
+    max_length = build_max_length_array(finfo_hash)
+    finfo_hash.each { |finfo| print_finfo(finfo, max_length) }
   end
 
   private
 
-  def print_dirname_long(file_group, file_groups_count)
-    puts file_group[:directory] if file_groups_count > 1 && !file_group[:directory].nil?
-    return if file_group[:files].empty?
+  def build_finfo_hash(files, directory)
+    files.map do |file|
+      stat = File.stat(file)
 
-    yield
-  end
-
-  def select_ftype(file)
-    type = File.ftype(file)
-    type == 'file' ? '-' : type[0]
-  end
-
-  def format_frole(nmode)
-    mode = nmode.chars
-
-    user = FILE_ROLE[mode[1]]
-    group = FILE_ROLE[mode[2]]
-    other = FILE_ROLE[mode[3]]
-
-    role = user + group + other
-    role.ljust(11, ' ')
+      {
+        type: FileTest.file?(file) ? '-' : File.ftype(file)[0],
+        mode: stat.mode.to_s(8)[-3, 3].chars.map(&FILE_ROLE).join,
+        nlink: stat.nlink.to_s,
+        uid: Etc.getpwuid(stat.uid).name,
+        gid: Etc.getgrgid(stat.gid).name,
+        size: stat.size.to_s,
+        time: format_ftime(stat.mtime),
+        name: directory.nil? ? file : File.basename(file)
+      }
+    end
   end
 
   def format_ftime(time)
@@ -78,21 +56,13 @@ class DetailedFormatter
     end
   end
 
-  def build_finfo_hash_list(files, directory)
-    files.map do |file|
-      stat = File.stat(file)
-
-      {
-        name: directory.nil? ? file : File.basename(file),
-        type: select_ftype(file),
-        mode: format_frole(stat.mode.to_s(8)[-4, 4]),
-        nlink: stat.nlink.to_s,
-        uid: Etc.getpwuid(stat.uid).name,
-        gid: Etc.getgrgid(stat.gid).name,
-        size: stat.size.to_s,
-        time: format_ftime(stat.mtime),
-        block: stat.blocks
-      }
-    end
+  def print_finfo(finfo, max_length)
+    print "#{finfo[:type]}#{finfo[:mode].ljust(11, ' ')}"
+    print "#{finfo[:nlink].rjust(max_length[0], ' ')} "
+    print "#{finfo[:uid].ljust(max_length[1], ' ')}　"
+    print "#{finfo[:gid].ljust(max_length[2], ' ')}　"
+    print "#{finfo[:size].rjust(max_length[3], ' ')} "
+    print "#{finfo[:time]} "
+    puts finfo[:name]
   end
 end

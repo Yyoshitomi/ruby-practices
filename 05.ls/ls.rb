@@ -17,21 +17,20 @@ def main
 
   optparse.parse!(ARGV)
 
-  file_groups = []
   if ARGV.empty?
     # ディレクトリやファイルの指定がなければカレントディレクトリからファイル一覧を取得する
-    sort_directories([Dir.pwd], option, file_groups)
+    files = []
+    directories = [Dir.pwd]
   else
     error_argv, files, directories = separate_directories_or_files(ARGV)
-
     error_argv.sort.each { |arg| puts "ls: #{arg}: No such file or directory" }
-
-    file_groups << { directory: nil, files: files } unless files.empty?
-    sort_directories(directories, option, file_groups)
   end
 
-  formatter = option[:l] ? DetailedFormatter.new : SimpleFormatter.new
-  formatter.output(file_groups, option)
+  file_groups = []
+  file_groups << { directory: nil, files: sort(files, option) } unless files.empty?
+  sort(directories, option).each { |dir| file_groups << open_directory(dir, option) }
+
+  output_files(file_groups, option[:l] ? DetailedFormatter.new : SimpleFormatter.new)
 end
 
 def separate_directories_or_files(argv)
@@ -52,13 +51,26 @@ def separate_directories_or_files(argv)
   [error_argv, files, directories]
 end
 
-def sort_directories(directories, option, file_groups)
-  sorted_directories = option[:r] ? directories.sort.reverse : directories.sort
-  sorted_directories.each do |dir|
-    pattern = "#{File.expand_path(dir)}/*"
-    opened_files = option[:a] ? Dir.glob(pattern, File::FNM_DOTMATCH) : Dir.glob(pattern)
+def sort(target, option)
+  option[:r] ? target.sort.reverse : target.sort
+end
 
-    file_groups << { directory: "#{dir}:", files: opened_files }
+def open_directory(dir, option)
+  pattern = "#{File.expand_path(dir)}/*"
+  flags = option[:a] ? File::FNM_DOTMATCH : 0
+  opened_directory = Dir.glob(pattern, flags).map { |file| option[:l] ? file : File.basename(file) }
+
+  { directory: dir, files: sort(opened_directory, option) }
+end
+
+def output_files(file_groups, formatter)
+  count = file_groups.count
+  file_groups.each_with_index do |file_group, i|
+    print "#{file_group[:directory]}:\n" if count > 1 && !file_group[:directory].nil?
+
+    formatter.output(file_group) unless file_group[:files].nil?
+
+    print "\n" unless i == count - 1
   end
 end
 
