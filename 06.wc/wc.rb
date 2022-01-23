@@ -31,9 +31,9 @@ def display_count_file(argv, options)
     end
   end
 
-  unless total_count.empty?
-    print_count total_count.transpose.map { |c| c.inject(:+) }, 'total'
-  end
+  return if total_count.empty?
+
+  print_count total_count.transpose.map { |c| c.inject(:+) }, 'total'
 end
 
 def count(text, options)
