@@ -28,7 +28,7 @@ def main
 
   file_groups = []
   file_groups << { directory: nil, files: sort(files, option) } unless files.empty?
-  sort(directories, option).each { |dir| file_groups << open_directory(dir, option) }
+  sort(directories, option).each { |dir| file_groups << build_file_group_in_directory(dir, option) }
 
   output_files(file_groups, option[:l] ? DetailedFormatter.new : SimpleFormatter.new)
 end
@@ -55,7 +55,7 @@ def sort(target, option)
   option[:r] ? target.sort.reverse : target.sort
 end
 
-def open_directory(dir, option)
+def build_file_group_in_directory(dir, option)
   pattern = "#{File.expand_path(dir)}/*"
   flags = option[:a] ? File::FNM_DOTMATCH : 0
   opened_directory = Dir.glob(pattern, flags).map { |file| option[:l] ? file : File.basename(file) }
