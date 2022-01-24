@@ -59,8 +59,8 @@ class DetailedFormatter
   def print_finfo(finfo, max_length)
     print "#{finfo[:type]}#{finfo[:mode].ljust(11, ' ')}"
     print "#{finfo[:nlink].rjust(max_length[0], ' ')} "
-    print "#{finfo[:uid].ljust(max_length[1], ' ')}　"
-    print "#{finfo[:gid].ljust(max_length[2], ' ')}　"
+    print "#{finfo[:uid].ljust(max_length[1], ' ')}  "
+    print "#{finfo[:gid].ljust(max_length[2], ' ')}  "
     print "#{finfo[:size].rjust(max_length[3], ' ')} "
     print "#{finfo[:time]} "
     puts finfo[:name]
