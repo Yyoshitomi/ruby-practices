@@ -41,8 +41,8 @@ def print_count(text_count, name = nil)
 end
 
 def print_error_message(arg)
-  messege = FileTest.directory?(arg) ? 'read: Is a directory' : 'open: No such file or directory'
-  puts "wc: #{arg}: #{messege}"
+  messege = FileTest.directory?(arg) ? 'read: Is a' : 'open: No such file or'
+  puts "wc: #{arg}: #{messege} directory"
 end
 
 main
