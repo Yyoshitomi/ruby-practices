@@ -16,7 +16,7 @@ class DetailedFormatter
 
   def output(file_group)
     total_block = file_group[:files].sum { |file| File.stat(file).blocks }
-    puts "total #{total_block}" if file_group[:directory].nil?
+    puts "total #{total_block}" unless file_group[:directory].nil?
 
     finfo_hash = build_finfo_hash(file_group[:files], file_group[:directory])
     max_length = build_max_length_array(finfo_hash)
@@ -59,8 +59,8 @@ class DetailedFormatter
   def print_finfo(finfo, max_length)
     print "#{finfo[:type]}#{finfo[:mode].ljust(11, ' ')}"
     print "#{finfo[:nlink].rjust(max_length[0], ' ')} "
-    print "#{finfo[:uid].ljust(max_length[1], ' ')}　"
-    print "#{finfo[:gid].ljust(max_length[2], ' ')}　"
+    print "#{finfo[:uid].ljust(max_length[1], ' ')}  "
+    print "#{finfo[:gid].ljust(max_length[2], ' ')}  "
     print "#{finfo[:size].rjust(max_length[3], ' ')} "
     print "#{finfo[:time]} "
     puts finfo[:name]
