@@ -14,19 +14,18 @@ def main
 end
 
 def display_count_file(argv, options)
-  total_count = Array.new(options[:l] ? 1 : 3, 0)
+  total_count = [Array.new(options[:l] ? 1 : 3, 0)]
   argv.each do |arg|
     if FileTest.file?(arg)
-      current_count = total_count
       text_count = count(File.read(arg), options)
       print_count(text_count, arg)
-      total_count = current_count.zip(text_count).map(&:sum) if argv.count > 1
+      total_count << text_count if argv.count > 1
     else
       print_error_message(arg)
     end
   end
 
-  print_count(total_count, 'total') if argv.count > 1
+  print_count(total_count[0].zip(*total_count[1..-1]).map(&:sum), 'total') if argv.count > 1
 end
 
 def count(text, options)
