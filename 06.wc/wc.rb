@@ -10,7 +10,7 @@ def main
 
   optparse.parse!(ARGV)
 
-  ARGV == [] ? print_count(count(readlines.join, options)) : display_count_file(ARGV, options)
+  ARGV.empty? ? print_count(count(readlines.join, options)) : display_count_file(ARGV, options)
 end
 
 def display_count_file(argv, options)
